@@ -1,0 +1,308 @@
+### Get auth token
+POST http://localhost:4111/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin"
+}
+
+###=========================================================================
+
+### Get All users
+GET http://localhost:4111/api/v1/admin/users
+Authorization: Basic YWRtaW46YWRtaW4=
+
+###=========================================================================
+
+### Positive test: Admin can create new user with correct data
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "Vladislav001201",
+  "password": "verySTRongPasswordD33$",
+  "role": "USER"
+}
+
+###=========================================================================
+
+### Negative test: Admin cannot create new user with blank username
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "  ",
+  "password": "verySTRongPasswordD33$",
+  "role": "USER"
+}
+
+###=========================================================================
+
+### Negative test : Admin cannot criate new user with 3 or 16 characters
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "Mu",
+  "password": "verySTRongPasswordD33$",
+  "role": "USER"
+}
+
+###=========================================================================
+
+### Negative test : Admin cannot criate new user with 3 or 16 characters
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "Myfassajzrakingt",
+  "password": "verySTRongPasswordD33$",
+  "role": "USER"
+}
+
+###=========================================================================
+
+### Negative test: Admin cannot create new username contains "!" characters
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "Msajzak!!",
+  "password": "verySTRongPasswordD33$",
+  "role": "USER"
+}
+
+###=========================================================================
+
+### Negative test: Admin cannot create new username contains "@" characters
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "Myfassajzra@",
+  "password": "VverySTRongPasswordD33$",
+  "role": "USER"
+}
+
+###=========================================================================
+
+### Negative test: Admin cannot create new username contains "#" characters
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "Myfassaj#zra",
+  "password": "VverySTRongPasswordD33$",
+  "role": "USER"
+}
+
+###=========================================================================
+
+### Negative test: Admin cannot create new username contains "$" characters
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "Myfassaj$zra",
+  "password": "VverySTRongPasswordD33$",
+  "role": "USER"
+}
+
+###=========================================================================
+
+### Negative test: Admin cannot create new username contains "%" characters
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "Myfassa%zra",
+  "password": "VverySTRongPasswordD33$",
+  "role": "USER"
+}
+
+###=========================================================================
+
+### Negative test: Admin cannot create new username contains "&" characters
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "Myfassa&zra",
+  "password": "VverySTRongPasswordD33$",
+  "role": "USER"
+}
+
+###=========================================================================
+
+### Negative test: Admin cannot create new username contains "*" characters
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "Myfass*zra",
+  "password": "VverySTRongPasswordD33$",
+  "role": "USER"
+}
+
+###=========================================================================
+
+### Negative test: Admin cannot create new username contains "!@#$%^&*()" characters
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "Myf!@#$%^&*()",
+  "password": "VverySTRongPasswordD33$",
+  "role": "USER"
+}
+
+###=========================================================================
+
+### Negative test: Admin cannot create new user with blank password
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "Vlad1201",
+  "password": "  ",
+  "role": "USER"
+}
+
+###=========================================================================
+
+### Negative test: Admin cannot create new user with password less than 8 characters
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "Vlad1201",
+  "password": "Vl#d9lr",
+  "role": "USER"
+}
+
+###=========================================================================
+
+### Negative test: Admin cannot create new user with password without digits
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "Vlad1201",
+  "password": "cvhVLS!@#",
+  "role": "USER"
+}
+
+###=========================================================================
+
+### Negative test: Admin cannot create new user with password without one lower case character
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "Vlad1201",
+  "password": "123VLS!@#",
+  "role": "USER"
+}
+
+###=========================================================================
+
+### Negative test: Admin cannot create new user with password without one upper case character
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "Vlad1201",
+  "password": "123kls!@#",
+  "role": "USER"
+}
+
+###=========================================================================
+
+### Negative test: Admin cannot create new user with password without one special character
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "Vlad1201",
+  "password": "123klsKLI",
+  "role": "USER"
+}
+
+###=========================================================================
+
+### Negative test: Admin cannot create new user with password with space
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "Vlad1201",
+  "password": "123kls KLI!%&",
+  "role": "USER"
+}
+
+###=========================================================================
+
+### Negative test: Admin cannot create new user with role not from "ADMIN", "USER"
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "VladislavFFFD",
+  "password": "verySTRongPassssswordD33$",
+  "role": "CREATOR"
+}
+
+###=========================================================================
+
+### Negative test: Create user that already exists by admin
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "kate11998",
+  "password": "verysTRongPassword33$",
+  "role": "USER"
+}
+
+###=========================================================================
+
+### Positive test: Authorized user can create account
+POST http://localhost:4111/api/v1/accounts
+Content-Type: application/json
+Authorization: Basic VmxhZGlzbGF2MDE6dmVyeVNUUm9uZ1Bhc3N3b3JkRDMzJA==
+
+{
+  "username": "Vladislav01",
+  "password": "verySTRongPasswordD33$",
+  "role": "USER"
+}
+
+###=========================================================================
+
+### Positive test: Check account was created
+GET http://localhost:4111/api/v1/customer/accounts
+Authorization: Basic VmxhZGlzbGF2MDE6dmVyeVNUUm9uZ1Bhc3N3b3JkRDMzJA==
+
+
