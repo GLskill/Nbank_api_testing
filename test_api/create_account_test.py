@@ -45,3 +45,16 @@ class TestCreateAccount:
         assert create_account_response.status_code == 201
         assert create_account_response.json().get('balance') == 0.0
         assert not create_account_response.json().get('transactions')
+
+        get_account_response = requests.get(
+            url='http://localhost:4111/api/v1/accounts',
+            headers={
+                'Accept': 'application/json',
+                'Authorization': authorization_token
+            }
+        )
+
+        assert get_account_response.status_code == 200
+        assert get_account_response.json().get('balance') == 0.0
+        assert not get_account_response.json().get('transactions')
+

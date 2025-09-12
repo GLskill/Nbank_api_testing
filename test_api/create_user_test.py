@@ -24,6 +24,18 @@ class TestCreateUser:
         assert response.json().get('username') == "Vladislav101"
         assert response.json().get('role') == "USER"
 
+        get_response = requests.get(
+            url=f'http://localhost:4111/api/v1/admin/users/Vladislav101',
+            headers={
+                'Accept': 'application/json',
+                'Authorization': 'Basic YWRtaW46YWRtaW4='
+            }
+        )
+
+        assert get_response.status_code == 200
+        assert get_response.json().get('username') == "Vladislav101"
+        assert get_response.json().get('role') == "USER"
+
     @pytest.mark.parametrize(
         argnames='username, password, role, error_key, error_value',
         argvalues=[
