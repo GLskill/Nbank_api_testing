@@ -17,3 +17,5 @@ class RandomData:
         digits = [str(faker.random_digit()) for _ in range(3)]
         special = [random.choice('!@#$%^&*')]
         return random.shuffle(upper + lower + digits + special)
+
+

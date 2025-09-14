@@ -11,3 +11,4 @@ class CreateAccountRequester(Requester):
         self.request_spec(response)
         return CreateAccountResponse(**response.json())
 
+

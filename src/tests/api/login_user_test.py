@@ -49,3 +49,4 @@ class TestLoginUser:
 
         assert login_response.username == login_user_request.username
         assert login_response.role == 'ADMIN'
+

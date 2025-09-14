@@ -43,3 +43,4 @@ class TestCreateUser:
             RequestSpecs.admin_auth_spec(),
             ResponseSpecs.request_return_bad_request(error_key, error_value)
         ).post(create_user_request)
+

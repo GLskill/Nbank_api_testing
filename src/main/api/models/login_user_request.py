@@ -5,3 +5,4 @@ class LoginUserRequest(BaseModel):
     username: str
     password: str
 
+

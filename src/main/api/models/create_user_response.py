@@ -11,3 +11,4 @@ class CreateUserResponse(BaseModel):
     role: str
     accounts: List[Dict[str, Any]]
 
+

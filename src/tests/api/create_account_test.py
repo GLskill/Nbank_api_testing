@@ -37,3 +37,4 @@ class TestCreateAccount:
             RequestSpecs.admin_auth_spec(),
             ResponseSpecs.entity_was_deleted()
         ).delete(create_user_response.id)
+

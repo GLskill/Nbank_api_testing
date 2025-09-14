@@ -5,3 +5,4 @@ class CreateUserRequest(BaseModel):
     username: str
     password: str
     role: str
+

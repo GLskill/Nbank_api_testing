@@ -23,3 +23,4 @@ class Config:
         return Config()._properties.get(key, default_value)
 
 
+
