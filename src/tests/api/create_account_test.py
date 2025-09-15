@@ -25,16 +25,28 @@ class TestCreateAccount:
         assert create_user_response.username == create_user_request.username
         assert create_user_response.role == create_user_request.role
 
-        create_account_response = CreateAccountRequester(
-            RequestSpecs.user_auth_spec(create_user_request.username, create_user_request.password),
-            ResponseSpecs.entity_was_created()
-        ).post()
+        try:
+            create_account_response = CreateAccountRequester(
+                RequestSpecs.user_auth_spec(create_user_request.username, create_user_request.password),
+                ResponseSpecs.entity_was_created()
+            ).post()
 
-        assert create_account_response.balance == 0.0
-        assert not create_account_response.transactions
+            get_account_response = CreateAccountRequester(
+                RequestSpecs.user_auth_spec(create_user_request.username, create_user_request.password),
+                ResponseSpecs.request_return_ok()
+            ).get()
 
-        AdminUserRequester(
-            RequestSpecs.admin_auth_spec(),
-            ResponseSpecs.entity_was_deleted()
-        ).delete(create_user_response.id)
+            assert create_account_response.balance == 0.0
+            assert not create_account_response.transactions
+
+            AdminUserRequester(
+                RequestSpecs.admin_auth_spec(),
+                ResponseSpecs.entity_was_not_found()
+            ).get(create_user_response.id)
+
+        finally:
+            AdminUserRequester(
+                RequestSpecs.admin_auth_spec(),
+                ResponseSpecs.entity_was_deleted()
+            ).delete(create_user_response.id)
 

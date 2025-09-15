@@ -11,4 +11,8 @@ class CreateAccountRequester(Requester):
         self.request_spec(response)
         return CreateAccountResponse(**response.json())
 
-
+    def get(self) -> CreateAccountResponse:
+        url = f'{self.base_url}/accounts'
+        response = requests.get(url=url, headers=self.headers)
+        self.request_spec(response)
+        return CreateAccountResponse(**response.json())

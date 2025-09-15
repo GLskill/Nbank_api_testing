@@ -23,6 +23,12 @@ class ResponseSpecs:
         return check
 
     @staticmethod
+    def entity_was_not_found() -> Callable:
+        def check(response: Response):
+            assert response.status_code == HTTPStatus.NOT_FOUND, response.text
+        return check
+
+    @staticmethod
     def request_return_bad_request(error_key: str, error_value: str) -> Callable:
         def check(response: Response):
             assert response.status_code == HTTPStatus.BAD_REQUEST, response.text

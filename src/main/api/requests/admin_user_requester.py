@@ -13,6 +13,13 @@ class AdminUserRequester(Requester):
         if response.status_code in [HTTPStatus.OK, HTTPStatus.CREATED]:
             return CreateUserResponse(**response.json())
 
+    def get(self, id: int) -> CreateUserResponse:
+        url = f'{self.base_url}/admin/users/{id}'
+        response = requests.get(url=url, headers=self.headers)
+        self.request_spec(response)
+        if response.status_code == HTTPStatus.OK:
+            return CreateUserResponse(**response.json())
+
     def delete(self, id: int):
         url = f'{self.base_url}/admin/users/{id}'
         response = requests.delete(url=url, headers=self.headers)
