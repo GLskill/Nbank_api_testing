@@ -12,5 +12,3 @@ class Requester(ABC):
 
     @abstractmethod
     def post(self, model: BaseModel): ...
-
-

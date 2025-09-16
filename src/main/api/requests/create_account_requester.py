@@ -16,3 +16,5 @@ class CreateAccountRequester(Requester):
         response = requests.get(url=url, headers=self.headers)
         self.request_spec(response)
         return CreateAccountResponse(**response.json())
+
+

@@ -1,5 +1,6 @@
-import requests
 import logging
+
+import requests
 
 from src.main.api.configs.config import Config
 from src.main.api.models.login_user_request import LoginUserRequest
@@ -44,4 +45,3 @@ class RequestSpecs:
             }
         logging.error(f'Authentication failed for {username} with status {response.status_code}')
         raise Exception('Failed to authenticate user')
-

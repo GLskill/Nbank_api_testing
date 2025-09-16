@@ -1,5 +1,6 @@
-import requests
 from http import HTTPStatus
+
+import requests
 
 from src.main.api.models.transfer_request import TransferRequest
 from src.main.api.models.transfer_response import TransferResponse
@@ -13,4 +14,3 @@ class TransferRequester(Requester):
         self.request_spec(response)
         if response.status_code == HTTPStatus.OK:
             return TransferResponse(**response.json())
-
