@@ -50,6 +50,20 @@ class TestCreateAccount:
             assert create_account_response.balance == 0.0
             assert not create_account_response.transactions
 
+            invalid_username_requester = CreateAccountRequester(
+                RequestSpecs.user_auth_spec(create_user_request.username + RandomData.get_username(),
+                                            create_user_request.password),
+                ResponseSpecs.request_return_unauth("error", "Invalid username or password")
+            )
+            invalid_username_requester.post()
+
+            invalid_password_requester = CreateAccountRequester(
+                RequestSpecs.user_auth_spec(create_user_request.username,
+                                            create_user_request.password + RandomData.get_password()),
+                ResponseSpecs.request_return_unauth("error", "Invalid username or password")
+            )
+            invalid_password_requester.post()
+
         finally:
             AdminUserRequester(
                 RequestSpecs.admin_auth_spec(),

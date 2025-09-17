@@ -40,3 +40,11 @@ class ResponseSpecs:
             assert error_value in response.json().get(error_key)
 
         return check
+
+    @staticmethod
+    def request_return_unauth(error_key: str, error_value: str) -> Callable:
+        def check(response: Response):
+            assert response.status_code == HTTPStatus.UNAUTHORIZED, response.text
+            assert error_value in response.json().get(error_key)
+
+        return check

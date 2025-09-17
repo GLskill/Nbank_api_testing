@@ -1,12 +1,12 @@
 import pytest
 
 from src.main.api.generators.random_data import RandomData
-from src.main.api.models.create_user_request import CreateUserRequest
-from src.main.api.models.deposit_request import DepositRequest
+from src.main.api.models.admin_steps_model import AdminSteps
+from src.main.api.models.deposit_steps_model import DepositSteps
 from src.main.api.models.transfer_request import TransferRequest
+from src.main.api.models.user_steps_model import UserSteps
 from src.main.api.requests.admin_user_requester import AdminUserRequester
 from src.main.api.requests.create_account_requester import CreateAccountRequester
-from src.main.api.requests.deposit_reqester import DepositRequester
 from src.main.api.requests.transfer_requester import TransferRequester
 from src.main.api.specs.request_specs import RequestSpecs
 from src.main.api.specs.response_specs import ResponseSpecs
@@ -14,104 +14,23 @@ from src.main.api.specs.response_specs import ResponseSpecs
 
 @pytest.mark.api
 class TestTransfer:
-    @pytest.mark.parametrize(
-        "username, password, role",
-        [(RandomData.get_username(), RandomData.get_password(), 'USER'), ]
-    )
-    def test_transfer_successful(self, username: str, password: str, role: str):
-        create_user1_request = CreateUserRequest(username=username, password=password, role=role)
 
-        create_user1_response = AdminUserRequester(
-            RequestSpecs.admin_auth_spec(),
-            ResponseSpecs.entity_was_created()
-        ).post(create_user1_request)
-
-        assert create_user1_response.username == create_user1_request.username
-        assert create_user1_response.role == create_user1_request.role
-
-        create_user2_request = CreateUserRequest(username=username, password=password, role=role)
-
-        create_user2_response = AdminUserRequester(
-            RequestSpecs.admin_auth_spec(),
-            ResponseSpecs.entity_was_created()
-        ).post(create_user1_request)
-
-        assert create_user2_response.username == create_user2_request.username
-        assert create_user2_response.role == create_user2_request.role
-
+    def test_transfer_successful(self):
+        username1 = RandomData.get_username()
+        password1 = RandomData.get_password()
+        role1 = 'USER'
+        username2 = RandomData.get_username()
+        password2 = RandomData.get_password()
+        role2 = 'USER'
         try:
-            create_account1_response = CreateAccountRequester(
-                RequestSpecs.user_auth_spec(create_user1_request.username, create_user1_request.password),
-                ResponseSpecs.entity_was_created()
-            ).post()
+            create_user1_response = AdminSteps.create_user(username1, password1, role1)
+            create_user2_response = AdminSteps.create_user(username2, password2, role2)
 
-            assert create_account1_response.balance == 0.0
-            assert not create_account1_response.transactions
+            create_account1_response = UserSteps.create_account(username1, password1)
+            create_account2_response = UserSteps.create_account(username2, password2)
 
-            get_account1_response = CreateAccountRequester(
-                RequestSpecs.user_auth_spec(create_user1_request.username, create_user1_request.password),
-                ResponseSpecs.request_return_ok()
-            ).get()
-
-            assert create_account1_response.balance == 0.0
-            assert not create_account1_response.transactions
-
-            # Create account for second user
-            create_account2_response = CreateAccountRequester(
-                RequestSpecs.user_auth_spec(create_user2_request.username, create_user2_request.password),
-                ResponseSpecs.entity_was_created()
-            ).post()
-
-            assert create_account2_response.balance == 0.0
-            assert not create_account2_response.transactions
-
-            get_account2_response = CreateAccountRequester(
-                RequestSpecs.user_auth_spec(create_user2_request.username, create_user2_request.password),
-                ResponseSpecs.request_return_ok()
-            ).get()
-
-            assert create_account2_response.balance == 0.0
-            assert not create_account2_response.transactions
-
-            AdminUserRequester(
-                RequestSpecs.admin_auth_spec(),
-                ResponseSpecs.entity_was_not_found()
-            ).get(create_user1_response.id)
-
-            assert create_account1_response.balance == 0.0
-            assert not create_account1_response.transactions
-
-            AdminUserRequester(
-                RequestSpecs.admin_auth_spec(),
-                ResponseSpecs.entity_was_not_found()
-            ).get(create_user2_response.id)
-
-            assert create_account2_response.balance == 0.0
-            assert not create_account2_response.transactions
-
-            deposit_amount = RandomData.get_deposit_amount(100.0, 100000.0)
-            deposit_request = DepositRequest(id=create_account1_response.id, balance=deposit_amount)
-            deposit_response = DepositRequester(
-                RequestSpecs.user_auth_spec(create_user1_request.username, create_user1_request.password),
-                ResponseSpecs.request_return_ok()
-            ).post(deposit_request)
-
-            assert deposit_response.balance == deposit_amount
-            assert any(
-                transaction.type == "DEPOSIT" and transaction.amount == deposit_amount
-                for transaction in deposit_response.transactions
-            )
-
-            get_account1_response = CreateAccountRequester(
-                RequestSpecs.user_auth_spec(create_user1_request.username, create_user1_request.password),
-                ResponseSpecs.request_return_ok()
-            ).get()
-
-            assert deposit_response.balance == deposit_amount
-            assert any(
-                transaction.type == "DEPOSIT" and transaction.amount == deposit_amount
-                for transaction in deposit_response.transactions
-            )
+            deposit_amount = RandomData.get_deposit_amount(100.0, 5000.0)
+            DepositSteps.make_deposit(create_account1_response.id, deposit_amount, username1, password1)
 
             transfer_amount = deposit_amount * 0.5
             transfer_request = TransferRequest(
@@ -121,7 +40,7 @@ class TestTransfer:
             )
 
             transfer_response = TransferRequester(
-                RequestSpecs.user_auth_spec(create_user1_request.username, create_user1_request.password),
+                RequestSpecs.user_auth_spec(create_user1_response.username, create_user1_response.password),
                 ResponseSpecs.request_return_ok()
             ).post(transfer_request)
 
@@ -131,7 +50,7 @@ class TestTransfer:
             assert transfer_response.amount == transfer_amount
 
             get_account1_after_transfer = CreateAccountRequester(
-                RequestSpecs.user_auth_spec(create_user1_request.username, create_user1_request.password),
+                RequestSpecs.user_auth_spec(create_user1_response.username, create_user1_response.password),
                 ResponseSpecs.request_return_ok()
             ).get()
 
@@ -142,7 +61,7 @@ class TestTransfer:
             )
 
             get_account2_after_transfer = CreateAccountRequester(
-                RequestSpecs.user_auth_spec(create_user2_request.username, create_user2_request.password),
+                RequestSpecs.user_auth_spec(create_user2_response.username, create_user2_response.password),
                 ResponseSpecs.request_return_ok()
             ).get()
 
@@ -156,8 +75,9 @@ class TestTransfer:
             AdminUserRequester(
                 RequestSpecs.admin_auth_spec(),
                 ResponseSpecs.entity_was_deleted()
-            ).delete(create_user1_response.id)
+            ).delete(create_account1_response.id)
             AdminUserRequester(
                 RequestSpecs.admin_auth_spec(),
                 ResponseSpecs.entity_was_deleted()
-            ).delete(create_user2_response.id)
+            ).delete(create_account2_response.id)
+
