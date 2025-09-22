@@ -1,6 +1,6 @@
 from src.main.api.models.base_model import BaseModel
 
-from typing import Optional, List, Dict, Any
+from typing import List
 
 
 class CreateAccountResponse(BaseModel):

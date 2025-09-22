@@ -40,7 +40,7 @@ class TestTransfer:
             )
 
             transfer_response = TransferRequester(
-                RequestSpecs.user_auth_spec(create_user1_response.username, create_user1_response.password),
+                RequestSpecs.user_auth_spec(create_user1_response.username1, create_user1_response.password2),
                 ResponseSpecs.request_return_ok()
             ).post(transfer_request)
 
@@ -50,7 +50,7 @@ class TestTransfer:
             assert transfer_response.amount == transfer_amount
 
             get_account1_after_transfer = CreateAccountRequester(
-                RequestSpecs.user_auth_spec(create_user1_response.username, create_user1_response.password),
+                RequestSpecs.user_auth_spec(create_user1_response.username1, create_user1_response.password1),
                 ResponseSpecs.request_return_ok()
             ).get()
 
@@ -61,7 +61,7 @@ class TestTransfer:
             )
 
             get_account2_after_transfer = CreateAccountRequester(
-                RequestSpecs.user_auth_spec(create_user2_response.username, create_user2_response.password),
+                RequestSpecs.user_auth_spec(create_user2_response.username2, create_user2_response.password2),
                 ResponseSpecs.request_return_ok()
             ).get()
 

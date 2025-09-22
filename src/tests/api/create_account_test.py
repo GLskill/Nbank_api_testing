@@ -1,6 +1,7 @@
 import pytest
 
 from src.main.api.generators.random_data import RandomData
+from src.main.api.models.create_account_response import CreateAccountResponse
 from src.main.api.models.create_user_request import CreateUserRequest
 from src.main.api.requests.admin_user_requester import AdminUserRequester
 from src.main.api.requests.create_account_requester import CreateAccountRequester
@@ -25,15 +26,15 @@ class TestCreateAccount:
         assert create_user_response.username == create_user_request.username
         assert create_user_response.role == create_user_request.role
 
+        create_account_response = CreateAccountRequester(
+            RequestSpecs.user_auth_spec(create_user_request.username, create_user_request.password),
+            ResponseSpecs.entity_was_created()
+        ).post()
+
+        assert create_account_response.balance == 0.0
+        assert not create_account_response.transactions
+
         try:
-            create_account_response = CreateAccountRequester(
-                RequestSpecs.user_auth_spec(create_user_request.username, create_user_request.password),
-                ResponseSpecs.entity_was_created()
-            ).post()
-
-            assert create_account_response.balance == 0.0
-            assert not create_account_response.transactions
-
             get_account_response = CreateAccountRequester(
                 RequestSpecs.user_auth_spec(create_user_request.username, create_user_request.password),
                 ResponseSpecs.request_return_ok()
