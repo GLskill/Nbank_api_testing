@@ -8,13 +8,13 @@ class CreateAccountRequester(Requester):
     def post(self) -> CreateAccountResponse:
         url = f'{self.base_url}/accounts'
         response = requests.post(url=url, headers=self.headers)
-        self.request_spec(response)
+        self.response_spec(response)
         return CreateAccountResponse(**response.json())
 
     def get(self) -> CreateAccountResponse:
         url = f'{self.base_url}/accounts'
         response = requests.get(url=url, headers=self.headers)
-        self.request_spec(response)
+        self.response_spec(response)
         return CreateAccountResponse(**response.json())
 
 

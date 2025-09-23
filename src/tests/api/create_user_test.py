@@ -28,12 +28,12 @@ class TestCreateUser:
     @pytest.mark.parametrize(
         argnames='username, password, role, error_key, error_value',
         argvalues=[
-            (' ', RandomData.get_password(), 'USER', 'username', 'Username must contain only letters'),
-            ('Vlasv_@1201', RandomData.get_password(), 'USER', 'username',
-             'Username must contain only letters, digits, dashes, underscores, and dots'),
-            ('gl', RandomData.get_password(), 'USER', 'username', 'Username must be between 3 and 15 characters'),
-            ('gliutjolfjuicbjt', RandomData.get_password(), 'USER', 'username',
-             'Username must be between 3 and 15 characters')
+            ('', RandomData.get_password(), 'USER', 'username', 'Username cannot be blank'),
+            ('ab', RandomData.get_password(), 'USER', 'username', 'Username must be between 3 and 15 characters'),
+            ('qwertyuiopqwerty', RandomData.get_password(), 'USER', 'username', 'Username must be '
+                                                                                'between 3 and 15 characters'),
+            ('@john_doe', RandomData.get_password(), 'USER', 'username', 'Username must contain only letters, digits,'
+                                                                         ' dashes, underscores, and dots'),
         ]
     )
     def test_create_invalid_user(self, username: str, password: str, role: str, error_key: str, error_value: str):

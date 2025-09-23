@@ -9,7 +9,7 @@ class LoginUserRequester(Requester):
     def post(self, login_user_request: LoginUserRequest) -> LoginUserResponses:
         url = f'{self.base_url}/auth/login'
         response = requests.post(url=url, json=login_user_request.model_dump(), headers=self.headers)
-        self.request_spec(response)
+        self.response_spec(response)
         return LoginUserResponses(**response.json())
 
 

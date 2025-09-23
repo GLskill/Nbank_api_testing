@@ -14,7 +14,6 @@ from src.main.api.specs.response_specs import ResponseSpecs
 
 @pytest.mark.api
 class TestTransfer:
-
     def test_transfer_successful(self):
         username1 = RandomData.get_username()
         password1 = RandomData.get_password()
@@ -80,4 +79,3 @@ class TestTransfer:
                 RequestSpecs.admin_auth_spec(),
                 ResponseSpecs.entity_was_deleted()
             ).delete(create_account2_response.id)
-

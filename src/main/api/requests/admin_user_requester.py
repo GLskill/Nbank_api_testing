@@ -11,21 +11,21 @@ class AdminUserRequester(Requester):
     def post(self, create_user_request: CreateUserRequest) -> CreateUserResponse:
         url = f'{self.base_url}/admin/users'
         response = requests.post(url=url, json=create_user_request.model_dump(), headers=self.headers)
-        self.request_spec(response)
+        self.response_spec(response)
         if response.status_code in [HTTPStatus.OK, HTTPStatus.CREATED]:
             return CreateUserResponse(**response.json())
 
     def get(self, id: int) -> CreateUserResponse:
         url = f'{self.base_url}/admin/users/{id}'
         response = requests.get(url=url, headers=self.headers)
-        self.request_spec(response)
+        self.response_spec(response)
         if response.status_code == HTTPStatus.OK:
             return CreateUserResponse(**response.json())
 
     def delete(self, id: int):
         url = f'{self.base_url}/admin/users/{id}'
         response = requests.delete(url=url, headers=self.headers)
-        self.request_spec(response)
+        self.response_spec(response)
         return response
 
 

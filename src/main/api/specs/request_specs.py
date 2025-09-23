@@ -3,7 +3,6 @@ import logging
 import requests
 
 from src.main.api.configs.config import Config
-from src.main.api.models.login_user_request import LoginUserRequest
 
 
 class RequestSpecs:
@@ -32,16 +31,18 @@ class RequestSpecs:
 
     @staticmethod
     def user_auth_spec(username: str, password: str):
-        auth_url = f'{Config.get('backendUrl')}/auth/login'
-        request = LoginUserRequest(username=username, password=password)
-        response = requests.post(url=auth_url, json=request.model_dump())
+        auth_url = f"{Config.get('backendUrl')}/auth/login"
+        response = requests.post(auth_url, json={"username": username, "password": password})
 
         if response.status_code == 200:
+            auth_header = response.headers.get("Authorization")
             headers = RequestSpecs.default_req_headers()
-            headers['Authorization'] = response.headers.get('Authorization')
+            headers["Authorization"] = auth_header
             return {
-                'headers': RequestSpecs.default_req_headers(),
-                'base_url': Config.get('backendUrl')
+                "base_url": Config.get("backendUrl"),
+                "headers": headers
             }
-        logging.error(f'Authentication failed for {username} with status {response.status_code}')
-        raise Exception('Failed to authenticate user')
+        else:
+            logging.error(f"Authentication failed for {username} with status {response.status_code}")
+            raise Exception("Failed to authenticate user")
+

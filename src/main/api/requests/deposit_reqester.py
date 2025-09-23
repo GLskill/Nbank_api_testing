@@ -9,7 +9,7 @@ class DepositRequester(Requester):
     def post(self, deposit_request: DepositRequest) -> DepositResponse:
         url = f'{self.base_url}/accounts/deposit'
         response = requests.post(url=url, json=deposit_request.model_dump(), headers=self.headers)
-        self.request_spec(response)
+        self.response_spec(response)
         if response.status_code == HTTPStatus.OK:
             return DepositResponse(**response.json())
 
