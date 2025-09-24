@@ -12,7 +12,7 @@ class CreateAccountRequester(Requester):
         return CreateAccountResponse(**response.json())
 
     def get(self) -> CreateAccountResponse:
-        url = f'{self.base_url}/accounts'
+        url = f'{self.base_url}/customer/accounts'
         response = requests.get(url=url, headers=self.headers)
         self.response_spec(response)
         return CreateAccountResponse(**response.json())

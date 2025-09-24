@@ -9,7 +9,7 @@ from src.main.api.requests.requester import Requester
 
 class TransferRequester(Requester):
     def post(self, transfer_request: TransferRequest) -> TransferResponse:
-        url = f'{self.base_url}/accounts/deposit'
+        url = f'{self.base_url}/accounts/transfer'
         response = requests.post(url=url, json=transfer_request.model_dump(), headers=self.headers)
         self.response_spec(response)
         if response.status_code == HTTPStatus.OK:
