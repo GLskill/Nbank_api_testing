@@ -1,10 +1,9 @@
 import pytest
 
 from src.main.api.generators.random_data import RandomData
-from src.main.api.models.admin_steps_model import AdminSteps
+from src.main.api.steps.admin_steps_model import AdminSteps
 from src.main.api.models.deposit_request import DepositRequest
-from src.main.api.models.user_steps_model import UserSteps
-from src.main.api.requests.create_account_requester import CreateAccountRequester
+from src.main.api.steps.user_steps_model import UserSteps
 from src.main.api.specs.request_specs import RequestSpecs
 from src.main.api.specs.response_specs import ResponseSpecs
 from src.main.api.requests.deposit_reqester import DepositRequester
