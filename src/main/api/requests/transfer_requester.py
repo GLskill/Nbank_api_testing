@@ -14,3 +14,4 @@ class TransferRequester(Requester):
         self.response_spec(response)
         if response.status_code == HTTPStatus.OK:
             return TransferResponse(**response.json())
+
