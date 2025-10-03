@@ -25,8 +25,8 @@ class TestTransfer:
         create_user2_response = None
 
         try:
-            create_user1_response = AdminSteps.create_user(username1, password1, role1)
-            create_user2_response = AdminSteps.create_user(username2, password2, role2)
+            create_user1_response = AdminSteps.create_user(username1, password1)
+            create_user2_response = AdminSteps.create_user(username2, password2)
 
             create_account1_response = UserSteps.create_account(username1, password1)
             create_account2_response = UserSteps.create_account(username2, password2)

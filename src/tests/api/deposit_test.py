@@ -1,44 +1,20 @@
 import pytest
 
+from src.main.api.classes.api_manager import ApiManager
 from src.main.api.generators.random_data import RandomData
-from src.main.api.steps.admin_steps_model import AdminSteps
+from src.main.api.models.create_user_request import CreateUserRequest
 from src.main.api.models.deposit_request import DepositRequest
-from src.main.api.steps.user_steps_model import UserSteps
-from src.main.api.specs.request_specs import RequestSpecs
-from src.main.api.specs.response_specs import ResponseSpecs
-from src.main.api.requests.deposit_reqester import DepositRequester
+from src.main.api.models.deposit_response import DepositResponse
 
 
 @pytest.mark.api
 class TestAccountDeposit:
-    @pytest.mark.parametrize(
-        "username, password, role",
-        [(RandomData.get_username(), RandomData.get_password(), 'USER'), ]
-    )
-    def test_successful_deposit(self, username: str, password: str, role: str):
-        create_user_response = AdminSteps.create_user(username, password, role)
-        create_account_response = UserSteps.create_account(username, password)
-
-        deposit_amount = RandomData.get_deposit_amount(1.0, 4999.0)
+    @pytest.mark.usefixtures('user_request', 'api_manager')
+    @pytest.mark.parametrize('deposit_amount', [RandomData.get_deposit_amount(1.0, 4999.0)])
+    def test_successful_deposit(self, api_manager: ApiManager, user_request: CreateUserRequest, deposit_amount):
+        create_account_response = api_manager.user_steps.create_account(user_request)
         deposit_request = DepositRequest(id=create_account_response.id, balance=deposit_amount)
-        deposit_response = DepositRequester(
-            RequestSpecs.user_auth_spec(username, password),
-            ResponseSpecs.request_return_ok()
-        ).post(deposit_request)
+        deposit_response = api_manager.user_steps.deposit_to_account(user_request, deposit_request)
 
         assert deposit_response.balance == deposit_amount
-        assert any(
-            transaction.type == "DEPOSIT" and transaction.amount == deposit_amount
-            for transaction in deposit_response.transactions
-        )
 
-        # get_account_response = CreateAccountRequester(
-        #     RequestSpecs.user_auth_spec(username, password),
-        #     ResponseSpecs.request_return_ok()
-        # ).get()
-        #
-        # assert get_account_response.balance == deposit_amount
-        # assert any(
-        #     transaction.type == "DEPOSIT" and transaction.amount == deposit_amount
-        #     for transaction in get_account_response.transactions
-        # )

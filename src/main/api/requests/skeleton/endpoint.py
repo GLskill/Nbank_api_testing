@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from enum import Enum
 
+from src.main.api.models.deposit_request import DepositRequest
+from src.main.api.models.deposit_response import DepositResponse
 from src.main.api.models.base_model import BaseModel
 from src.main.api.models.create_account_response import CreateAccountResponse
 from src.main.api.models.create_user_request import CreateUserRequest
@@ -39,4 +41,10 @@ class Endpoint(Enum):
         url='/accounts',
         request_model=None,
         response_model=CreateAccountResponse
+    )
+
+    DEPOSIT_ACCOUNT = EndpointConfig(
+        url='/accounts/deposit',
+        request_model=DepositRequest,
+        response_model=DepositResponse
     )
