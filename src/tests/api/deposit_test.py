@@ -12,3 +12,9 @@ class TestAccountDeposit:
         assert response.balance == deposit_setup["deposit_amount"]
         assert response.balance > 0
         assert response.id == deposit_setup["deposit_request"].id
+
+        account_after_deposit = api_manager.user_steps.get_account_by_id(response.id, deposit_setup["user"])
+
+        assert response.balance == deposit_setup["deposit_amount"]
+        assert response.balance > 0
+        assert response.id == deposit_setup["deposit_request"].id

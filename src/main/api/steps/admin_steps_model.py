@@ -29,6 +29,23 @@ class AdminSteps(BaseSteps):
             ResponseSpecs.request_return_bad_request(error_key, error_value)
         ).post(user_request)
 
+    def get_all_users(self):
+        response = CrudRequester(
+            RequestSpecs.admin_auth_spec(),
+            Endpoint.ADMIN_GET_ALL_USER,
+            ResponseSpecs.request_return_ok()
+        ).get_all()
+        return response
+
+    def get_user_by_id(self, user_id: int) -> CreateUserResponse:
+        response = self.get_all_users()
+        users = response.json()
+        for user_data in users:
+            if user_data.get('id') == user_id:
+                return CreateUserResponse.model_validate(user_data)
+
+        raise ValueError(f"User with id {user_id} not found in users list")
+
     def delete_user(self, user_id: int):
         CrudRequester(
             RequestSpecs.admin_auth_spec(),

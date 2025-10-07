@@ -36,6 +36,22 @@ class UserSteps(BaseSteps):
         assert not create_account_response.transactions
         return create_account_response
 
+    def get_all_customer_accounts(self, user_request: CreateUserRequest):
+        customers_response = ValidatedCrudRequester(
+            RequestSpecs.user_auth_spec(user_request.username, user_request.password),
+            Endpoint.GET_CUSTOMER_ACCOUNTS,
+            ResponseSpecs.request_return_ok()
+        ).get_all()
+        return customers_response
+
+    def get_account_by_id(self, account_id: int, user_request: CreateUserRequest) -> CreateAccountResponse:
+        response = self.get_all_customer_accounts(user_request)
+        accounts = response.json()
+        for account_data in accounts:
+            if account_data.get('id') == account_id:
+                return CreateAccountResponse.model_validate(account_data)
+        raise ValueError(f"Account with id {account_id} not found in customer accounts")
+
     def deposit_to_account(self, user_request: CreateUserRequest, deposit_request: DepositRequest) -> DepositResponse:
         deposit_response: DepositResponse = ValidatedCrudRequester(
             RequestSpecs.user_auth_spec(user_request.username, user_request.password),

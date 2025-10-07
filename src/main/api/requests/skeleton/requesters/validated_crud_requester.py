@@ -1,5 +1,7 @@
 from typing import TypeVar, Optional
 
+import requests
+
 from src.main.api.models.base_model import BaseModel
 from src.main.api.requests.skeleton.http_request import HttpRequest
 from src.main.api.requests.skeleton.requesters.crud_requester import CrudRequester
@@ -20,8 +22,13 @@ class ValidatedCrudRequester(HttpRequest):
         response = self.crud_requester.post(model)
         return self.endpoint.value.response_model.model_validate(response.json())
 
-    def get(self, id: int): ...
+    def get(self, id: int):
+        response = self.crud_requester.get(id)
+        return self.endpoint.value.response_model.model_validate(response.json())
+
+    def get_all(self) -> requests.Response:
+        response = self.crud_requester.get_all()
+        return response
+
     def update(self, id: int): ...
     def delete(self, id: int): ...
-
-

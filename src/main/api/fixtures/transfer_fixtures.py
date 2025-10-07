@@ -22,5 +22,5 @@ def transfer_setup(api_manager: ApiManager, deposit_setup):
         amount=deposit_setup["deposit_amount"] * 0.5
     )
 
-    yield {"transfer_request": transfer_request, "user1": deposit_setup["user"]}
+    yield {"transfer_request": transfer_request, "user1": deposit_setup["user"], "user2": user2}
 

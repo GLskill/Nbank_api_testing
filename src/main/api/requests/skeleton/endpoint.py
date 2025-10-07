@@ -27,6 +27,12 @@ class Endpoint(Enum):
         response_model=CreateUserResponse
     )
 
+    ADMIN_GET_ALL_USER = EndpointConfig(
+        url='/admin/users',
+        request_model=None,
+        response_model=CreateUserResponse
+    )
+
     ADMIN_DELETE_USER = EndpointConfig(
         url='/admin/users',
         request_model=None,
@@ -45,6 +51,12 @@ class Endpoint(Enum):
         response_model=CreateAccountResponse
     )
 
+    GET_ACCOUNT = EndpointConfig(
+        url='/accounts',
+        request_model=None,
+        response_model=CreateAccountResponse
+    )
+
     DEPOSIT_ACCOUNT = EndpointConfig(
         url='/accounts/deposit',
         request_model=DepositRequest,
@@ -56,3 +68,10 @@ class Endpoint(Enum):
         request_model=TransferRequest,
         response_model=TransferResponse
     )
+
+    GET_CUSTOMER_ACCOUNTS = EndpointConfig(
+        url='/customer/accounts',
+        request_model=None,
+        response_model=CreateAccountResponse
+    )
+
