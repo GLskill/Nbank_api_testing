@@ -54,3 +54,5 @@ class ModelComparisonConfigLoader:
 
     def get_rule_for(self, request_class: Type) -> Optional[ComparisonRule]:
         return self.rules.get(request_class.__class__.__name__)
+
+

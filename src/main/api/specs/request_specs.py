@@ -42,3 +42,5 @@ class RequestSpecs:
             headers = RequestSpecs.default_req_headers()
             headers["Authorization"] = auth_header
             return headers
+
+

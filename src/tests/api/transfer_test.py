@@ -31,3 +31,5 @@ class TestTransfer:
 
         assert sender_after.balance == sender_before.balance - transfer_setup["transfer_request"].amount
         assert receiver_after.balance == receiver_before.balance + transfer_setup["transfer_request"].amount
+
+

@@ -21,3 +21,4 @@ def cleanup_objects(objects: List[Any]):
         else:
             logging.warning(f'Object type: {type(obj)} is not deleted')
 
+

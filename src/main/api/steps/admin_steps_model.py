@@ -52,3 +52,5 @@ class AdminSteps(BaseSteps):
             Endpoint.ADMIN_DELETE_USER,
             ResponseSpecs.entity_was_deleted()
         ).delete(user_id)
+
+

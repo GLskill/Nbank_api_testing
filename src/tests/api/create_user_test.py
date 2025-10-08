@@ -33,3 +33,5 @@ class TestCreateUser:
                                  error_value: str):
         create_user_request = CreateUserRequest(username=username, password=password, role=role)
         api_manager.admin_steps.create_invalid_user(create_user_request, error_key, error_value)
+
+

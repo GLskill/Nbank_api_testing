@@ -48,3 +48,5 @@ class ResponseSpecs:
             assert error_value in response.json().get(error_key)
 
         return check
+
+
