@@ -1,46 +1,35 @@
 import pytest
 
+from src.main.api.classes.api_manager import ApiManager
 from src.main.api.generators.random_data import RandomData
+from src.main.api.generators.random_model_generator import RandomModelGenerator
 from src.main.api.models.create_user_request import CreateUserRequest
-from src.main.api.requests.admin_user_requester import AdminUserRequester
-from src.main.api.specs.request_specs import RequestSpecs
-from src.main.api.specs.response_specs import ResponseSpecs
 
 
 @pytest.mark.api
 class TestCreateUser:
-    def test_create_valid_user(self):
-        create_user_request = CreateUserRequest(username=RandomData.get_username(),
-                                                password=RandomData.get_password(), role='USER')
-        create_user_response = AdminUserRequester(
-            RequestSpecs.admin_auth_spec(),
-            ResponseSpecs.entity_was_created()
-        ).post(create_user_request)
+    @pytest.mark.usefixtures('api_manager')
+    @pytest.mark.parametrize('create_user_request', [RandomModelGenerator.generate(CreateUserRequest)])
+    def test_create_valid_user(self, api_manager: ApiManager, create_user_request: CreateUserRequest):
+        created_user = api_manager.admin_steps.create_user(create_user_request)
+        fetched_user = api_manager.admin_steps.get_user_by_id(created_user.id)
 
-        assert create_user_response.username == create_user_request.username
-        assert create_user_response.role == create_user_request.role
-
-        AdminUserRequester(
-            RequestSpecs.admin_auth_spec(),
-            ResponseSpecs.entity_was_deleted()
-        ).delete(create_user_response.id)
+        assert fetched_user.id == created_user.id
+        assert fetched_user.username == created_user.username
 
     @pytest.mark.parametrize(
         argnames='username, password, role, error_key, error_value',
         argvalues=[
             ('', RandomData.get_password(), 'USER', 'username', 'Username cannot be blank'),
             ('ab', RandomData.get_password(), 'USER', 'username', 'Username must be between 3 and 15 characters'),
-            ('qwertyuiopqwerty', RandomData.get_password(), 'USER', 'username', 'Username must be '
-                                                                                'between 3 and 15 characters'),
-            ('@john_doe', RandomData.get_password(), 'USER', 'username', 'Username must contain only letters, digits,'
-                                                                         ' dashes, underscores, and dots'),
+            ('qwertyuiopqwerty', RandomData.get_password(), 'USER', 'username',
+             'Username must be between 3 and 15 characters'),
+            ('@john_doe', RandomData.get_password(), 'USER', 'username',
+             'Username must contain only letters, digits, dashes, underscores, and dots'),
         ]
     )
-    def test_create_invalid_user(self, username: str, password: str, role: str, error_key: str, error_value: str):
+    @pytest.mark.usefixtures('api_manager')
+    def test_create_invalid_user(self, api_manager: ApiManager, username: str, password: str, role: str, error_key: str,
+                                 error_value: str):
         create_user_request = CreateUserRequest(username=username, password=password, role=role)
-
-        AdminUserRequester(
-            RequestSpecs.admin_auth_spec(),
-            ResponseSpecs.request_return_bad_request(error_key, error_value)
-        ).post(create_user_request)
-
+        api_manager.admin_steps.create_invalid_user(create_user_request, error_key, error_value)
