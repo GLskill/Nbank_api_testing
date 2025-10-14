@@ -13,3 +13,5 @@ class TestLoginUser:
     @pytest.mark.usefixtures('api_manager', 'admin_user_request')
     def test_login_admin_user(self, api_manager: ApiManager, admin_user_request: CreateUserRequest):
         api_manager.user_steps.login(admin_user_request)
+
+

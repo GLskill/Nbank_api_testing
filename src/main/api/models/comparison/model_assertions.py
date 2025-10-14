@@ -24,3 +24,5 @@ class ModelAssertions:
             raise AssertionError(f'No comparison rule found for class {self.request.__cass__.__name__}')
         return self
 
+
+

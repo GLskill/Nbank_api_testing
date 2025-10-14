@@ -18,3 +18,5 @@ class TestAccountDeposit:
         assert response.balance == deposit_setup["deposit_amount"]
         assert response.balance > 0
         assert response.id == deposit_setup["deposit_request"].id
+
+

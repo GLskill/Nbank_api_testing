@@ -24,3 +24,4 @@ def transfer_setup(api_manager: ApiManager, deposit_setup):
 
     yield {"transfer_request": transfer_request, "user1": deposit_setup["user"], "user2": user2}
 
+

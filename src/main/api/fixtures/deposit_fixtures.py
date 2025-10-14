@@ -15,3 +15,4 @@ def deposit_setup(api_manager: ApiManager):
     deposit_request = DepositRequest(id=account.id, balance=deposit_amount)
     yield {"deposit_request": deposit_request, "user": user, "deposit_amount": deposit_amount}
 
+

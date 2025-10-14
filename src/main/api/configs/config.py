@@ -22,3 +22,4 @@ class Config:
     @staticmethod
     def get(key: str, default_value: Any = None) -> Any:
         return Config()._properties.get(key, default_value)
+

@@ -52,3 +52,4 @@ class RandomModelGenerator:
             return [str(uuid.uuid4())[:5] for _ in random.randint(3, 10)]
         elif isinstance(field_type, type):
             return
+
