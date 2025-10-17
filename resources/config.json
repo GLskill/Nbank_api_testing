@@ -1,0 +1,7 @@
+{
+  "browser": "chromium",
+  "headless": false,
+  "frontend_url": "http://localhost:3000",
+  "viewport": { "width": 1920, "height": 1080 },
+  "record_video_dir": "src/tests/ui/videos/"
+}
