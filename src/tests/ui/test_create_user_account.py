@@ -1,15 +1,11 @@
-import requests
-from src.main.api.generators.random_model_generator import RandomModelGenerator
-from src.main.api.models.create_user_request import CreateUserRequest
 from src.main.api.steps.admin_steps_model import AdminSteps
 from src.main.api.steps.user_steps_model import UserSteps
 from src.main.ui.page_object.handle_dialog import DialogHelper
 
 
-def test_user_can_create_account_by_ui(browser_context, config, page_objects):
-    new_user = RandomModelGenerator.generate(CreateUserRequest)  # Create user by admin
+def test_user_can_create_account_by_ui(browser_context, config, page_objects, new_user):
     AdminSteps([]).create_user(new_user)
-    UserSteps([]).login(new_user)    # User login
+    UserSteps([]).login(new_user)  # User login
 
     page_objects["login"].auth_as_user(new_user.username, new_user.password)
     page_objects["dashboard"].open_user_page()

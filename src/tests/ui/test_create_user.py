@@ -1,22 +1,17 @@
-from src.main.api.generators.random_model_generator import RandomModelGenerator
-from src.main.api.models.create_user_request import CreateUserRequest
 from src.main.api.steps.admin_steps_model import AdminSteps
 from src.main.ui.page_object.admin_panel_page import AdminPanel
 from src.main.ui.page_object.handle_dialog import DialogHelper
 
 
-def test_admin_create_user(browser_context, page_objects):
-    admin = CreateUserRequest(username="admin", password="admin", role="ADMIN")
-    new_user = RandomModelGenerator.generate(CreateUserRequest)
-
-    page_objects["login"].open_login_page().login(admin.username, admin.password)  # Admin Login
+def test_admin_create_user(browser_context, page_objects, admin_user, new_user):
+    page_objects["login"].open_login_page().login(admin_user.username, admin_user.password)  # Admin Login
     assert page_objects["admin"].is_admin_panel_visible()
 
     page_objects["admin"].open_admin_page()  # Create user
     with browser_context.expect_event("dialog") as dialog_info:
         page_objects["admin"].create_new_user(new_user.username, new_user.password)
 
-    DialogHelper.assert_dialog_exact_text(dialog_info, AdminPanel.SUCCESS_USER_CREATED)  # Check alert with expected success message
+    DialogHelper.assert_dialog_exact_text(dialog_info,AdminPanel.SUCCESS_USER_CREATED)  # Check alert with expected success message
 
     browser_context.reload()  # Check user on UI
     page_objects["admin"].all_user_visible()
@@ -27,11 +22,8 @@ def test_admin_create_user(browser_context, page_objects):
         f"User '{new_user.username}' not found in API"
 
 
-def test_admin_create_invalid_user(browser_context, page_objects):
-    admin = CreateUserRequest(username="admin", password="admin", role="ADMIN")
-    new_user = RandomModelGenerator.generate(CreateUserRequest)
-
-    page_objects["login"].open_login_page().login(admin.username, admin.password)  # Login admin
+def test_admin_create_invalid_user(browser_context, page_objects, admin_user, new_user):
+    page_objects["login"].open_login_page().login(admin_user.username, admin_user.password)  # Login admin
     assert page_objects["admin"].is_admin_panel_visible(), "Admin Panel should be visible"
 
     page_objects["admin"].open_admin_page()  # Create user
