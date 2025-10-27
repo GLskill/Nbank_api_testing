@@ -3,6 +3,9 @@ from src.main.ui.page_object.base_page import BasePage
 
 
 class AdminPanel(BasePage):
+    SUCCESS_USER_CREATED = "✅ User created successfully!"
+    ERROR_USERNAME_LENGTH = "Username must be between 3 and 15 characters"
+
     def __init__(self, page: Page, frontend_url: str):
         super().__init__(page, frontend_url)
 
