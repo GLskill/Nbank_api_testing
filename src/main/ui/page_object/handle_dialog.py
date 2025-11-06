@@ -1,11 +1,9 @@
 import re
 from typing import Any
-
 from playwright.sync_api import Dialog
 
 
 class DialogHelper:
-
     @staticmethod
     def handle_dialog(dialog_info: Any, auto_accept: bool = True) -> str:
         dialog: Dialog = dialog_info.value

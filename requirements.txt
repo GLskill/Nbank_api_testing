@@ -1,6 +1,22 @@
+# Testing frameworks
 pytest~=8.4.2
+pytest-html==4.1.1
+pytest-xdist==3.5.0
+pytest-rerunfailures==13.0
+
+# Playwright for UI tests
+playwright~=1.55.0
+pytest-playwright==0.5.0
+
+# API testing
 requests~=2.32.5
 pydantic~=2.11.9
+
+# Reporting
+allure-pytest==2.13.2
+pytest-json-report==1.5.0
+
+# Utilities
+python-dotenv==1.0.0
 faker~=37.8.0
-rstr~=3.2.2
-playwright~=1.55.0
+rstr>=3.0.0

@@ -14,7 +14,7 @@ class CrudRequester(HttpRequest, CrudEndpointInterface):
     def post(self, model: Optional[T] = None) -> requests.Response:
         body = model.model_dump() if model is not None else ''
         response = requests.post(
-            url=f'{Config.get('server')}{Config.get('api_version')}{self.endpoint.value.url}',
+            url=f"{Config.get('server')}{Config.get('api_version')}{self.endpoint.value.url}",
             headers=self.request_spec,
             json=body
         )
@@ -41,7 +41,7 @@ class CrudRequester(HttpRequest, CrudEndpointInterface):
 
     def delete(self, id: int) -> requests.Response:
         response = requests.delete(
-            url=f'{Config.get('server')}{Config.get('api_version')}{self.endpoint.value.url}/{id}',
+            url=f"{Config.get('server')}{Config.get('api_version')}{self.endpoint.value.url}/{id}",
             headers=self.request_spec
         )
         self.response_spec(response)

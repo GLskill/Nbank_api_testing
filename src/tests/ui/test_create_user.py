@@ -11,7 +11,7 @@ def test_admin_create_user(browser_context, page_objects, admin_user, new_user):
     with browser_context.expect_event("dialog") as dialog_info:
         page_objects["admin"].create_new_user(new_user.username, new_user.password)
 
-    DialogHelper.assert_dialog_exact_text(dialog_info,AdminPanel.SUCCESS_USER_CREATED)  # Check alert with expected success message
+    DialogHelper.assert_dialog_exact_text(dialog_info, AdminPanel.SUCCESS_USER_CREATED)  # Check alert with expected success message
 
     browser_context.reload()  # Check user on UI
     page_objects["admin"].all_user_visible()
