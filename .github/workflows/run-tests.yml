@@ -1,0 +1,59 @@
+name: Run tests
+
+on: [push, workflow_dispatch]
+
+jobs:
+  run-tests:
+    name: Setup services (review app) and run tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+      - run: pip install -r requirements.txt
+
+      - name: Setup playwright
+        run: playwright install --with-deps
+
+      - name: Run app
+        run: make start-app
+
+      - name: Run tests
+        env:
+          SERVER: http://localhost:4111/api
+          API_VERSION: /v1
+          UI_BASE_URL: http://localhost:3000
+        run: make run-tests
+
+      - name: Load test report history
+        uses: actions/checkout@v5
+        if: always()
+        with:
+          repository: ${{ github.repository }}
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Build Allure report
+        uses: simple-elf/allure-report-action@master
+        if: always()
+        with:
+          allure_results: allure-results
+          gh_pages: gh-pages
+          allure_history: allure-history
+
+      - name: Publish test reports
+        uses: peaceiris/actions-gh-pages@v3
+        if: always()
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: allure-history
+          keep_files: true
+
+      - name: Stop services
+        if: always()
+        run: make stop-app
