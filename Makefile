@@ -12,6 +12,33 @@ TEST_OUTPUT_DIR ?= $(shell pwd)/test-results/$(shell date +"%Y-%m-%d_%H-%M-%S")
 # Профиль тестов (по умолчанию api)
 TEST_PROFILE ?= api
 
+# === ДЛЯ GITHUB ACTIONS ===
+
+.PHONY: start-app
+start-app:
+	@echo "Starting backend and frontend for CI..."
+	docker compose -f $(DOCKER_COMPOSE_FILE) up -d backend frontend
+	@echo "Waiting for services to be ready..."
+	sleep 10
+	@echo "Services started successfully"
+
+.PHONY: run-tests
+run-tests:
+	@echo "Running tests locally for CI..."
+	mkdir -p allure-results
+	pytest src/tests/ -v \
+		--log-level=DEBUG \
+		--log-cli-level=DEBUG \
+		--html=html_report.html \
+		--self-contained-html \
+		--junitxml=junit.xml \
+		--alluredir=allure-results
+
+.PHONY: stop-app
+stop-app:
+	@echo "Stopping services..."
+	docker compose -f $(DOCKER_COMPOSE_FILE) down
+
 # === DOCKER COMPOSE - ОСНОВНОЙ СПОСОБ ЗАПУСКА ===
 
 .PHONY: test-all
@@ -152,3 +179,8 @@ help:
 	@echo "  make allure-serve          - Start Allure report server"
 	@echo "  make clean                 - Clean test results"
 	@echo "  make build-image           - Build Docker test image"
+	@echo ""
+	@echo "For GitHub Actions:"
+	@echo "  make start-app             - Start services for CI"
+	@echo "  make run-tests             - Run tests in CI"
+	@echo "  make stop-app              - Stop services in CI"

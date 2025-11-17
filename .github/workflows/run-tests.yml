@@ -14,7 +14,9 @@ jobs:
         with:
           python-version: '3.13'
           cache: 'pip'
-      - run: pip install -r requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
       - name: Setup playwright
         run: playwright install --with-deps
@@ -22,16 +24,38 @@ jobs:
       - name: Run app
         run: make start-app
 
+      - name: Wait for services to be ready
+        run: |
+          echo "Waiting for backend..."
+          for i in {1..30}; do
+            if curl -f http://localhost:4111/api/health 2>/dev/null; then
+              echo "Backend is ready"
+              break
+            fi
+            echo "Waiting... ($i/30)"
+            sleep 2
+          done
+          
+          echo "Waiting for frontend..."
+          for i in {1..30}; do
+            if curl -f http://localhost:3000 2>/dev/null; then
+              echo "Frontend is ready"
+              break
+            fi
+            echo "Waiting... ($i/30)"
+            sleep 2
+          done
+
       - name: Run tests
         env:
-          SERVER: http://localhost:4111/api
-          API_VERSION: /v1
-          UI_BASE_URL: http://localhost:3000
+          BASE_API_URL: http://localhost:4111/api
+          BASE_UI_URL: http://localhost:3000
         run: make run-tests
 
       - name: Load test report history
         uses: actions/checkout@v5
         if: always()
+        continue-on-error: true
         with:
           repository: ${{ github.repository }}
           ref: gh-pages
