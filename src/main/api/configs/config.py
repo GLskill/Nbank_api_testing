@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from typing import Any
 
@@ -21,5 +22,15 @@ class Config:
 
     @staticmethod
     def get(key: str, default_value: Any = None) -> Any:
-        return Config()._properties.get(key, default_value)
+        env_mapping = {
+            'frontendUrl': 'BASE_UI_URL',
+            'backendUrl': 'BASE_API_URL',
+            'server': 'BASE_API_URL',
+        }
+        env_key = env_mapping.get(key)
+        if env_key:
+            env_value = os.getenv(env_key)
+            if env_value:
+                return env_value
 
+        return Config()._properties.get(key, default_value)
