@@ -11,8 +11,11 @@ from src.main.api.requests.requester import Requester
 class TransferRequester(Requester):
     def __init__(self, request_spec=None, response_spec=None):
         request_spec = request_spec or {}
-        base = (request_spec.get('base_url') or os.getenv('BASE_API_URL') or 'http://localhost:4111/api')
-        request_spec['base_url'] = base.rstrip('/') + '/v1'
+        base = (request_spec.get('base_url') or os.getenv('BASE_API_URL') or 'http://localhost:4111')
+        base = base.rstrip('/')
+        if not base.endswith('/api'):
+            base = base + '/api'
+        request_spec['base_url'] = base + '/v1'
         super().__init__(request_spec, response_spec)
 
     def post(self, transfer_request: TransferRequest) -> TransferResponse:

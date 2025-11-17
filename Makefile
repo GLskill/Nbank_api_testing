@@ -17,10 +17,10 @@ TEST_PROFILE ?= api
 
 .PHONY: start-app
 start-app:
-	@echo "Starting backend and frontend for CI..."
-	docker compose -f $(DOCKER_COMPOSE_FILE) up -d backend frontend
+	@echo "Starting backend, frontend and nginx for CI..."
+	docker compose -f $(DOCKER_COMPOSE_FILE) up -d backend frontend nginx
 	@echo "Waiting for services to be ready..."
-	sleep 15
+	sleep 20
 	@echo "Services started successfully"
 
 .PHONY: run-tests

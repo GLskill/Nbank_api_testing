@@ -36,20 +36,37 @@ jobs:
             sleep 2
           done
           
-          echo "Waiting for frontend..."
+          echo "Waiting for nginx (frontend proxy)..."
           for i in {1..30}; do
-            if curl -f http://localhost:3000 2>/dev/null; then
-              echo "Frontend is ready"
+            if curl -f http://localhost:80 2>/dev/null; then
+              echo "Nginx is ready"
               break
             fi
             echo "Waiting... ($i/30)"
             sleep 2
           done
 
+      - name: Debug services
+        run: |
+          echo "=== Docker containers ==="
+          docker ps
+          
+          echo "=== Testing backend directly ==="
+          curl -v http://localhost:4111/api/health || echo "Backend not ready"
+          
+          echo "=== Testing frontend via nginx ==="
+          curl -v http://localhost:80 || echo "Nginx not ready"
+          
+          echo "=== Nginx logs ==="
+          docker logs nginx 2>&1 | tail -20
+          
+          echo "=== Frontend logs ==="
+          docker logs nbank-frontend 2>&1 | tail -20
+
       - name: Run tests
         env:
           BASE_API_URL: http://localhost:4111
-          BASE_UI_URL: http://localhost:3000
+          BASE_UI_URL: http://localhost:80
         run: make run-tests
 
       - name: Load test report history
