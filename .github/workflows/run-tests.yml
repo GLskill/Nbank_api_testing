@@ -38,7 +38,7 @@ jobs:
           
           echo "Waiting for frontend..."
           for i in {1..30}; do
-            if curl -f http://localhost 2>/dev/null; then
+            if curl -f http://localhost:3000 2>/dev/null; then
               echo "Frontend is ready"
               break
             fi
@@ -49,7 +49,7 @@ jobs:
       - name: Run tests
         env:
           BASE_API_URL: http://localhost:4111/api
-          BASE_UI_URL: http://localhost
+          BASE_UI_URL: http://localhost:3000
         run: make run-tests
 
       - name: Load test report history

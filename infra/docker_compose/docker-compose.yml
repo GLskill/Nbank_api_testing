@@ -13,12 +13,11 @@ services:
     networks:
       - nbank-network
 
-
   frontend:
     image: nobugsme/nbank-ui:latest
     container_name: nbank-frontend
-    expose:
-      - "80"
+    ports:
+      - "3000:80"
     depends_on:
       - backend
     networks:
@@ -35,6 +34,3 @@ services:
       - frontend
     networks:
       - nbank-network
-
-
-
