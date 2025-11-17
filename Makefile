@@ -30,8 +30,6 @@ run-tests:
 	pytest src/tests/ -v \
 		--log-level=DEBUG \
 		--log-cli-level=DEBUG \
-		--html=html_report.html \
-		--self-contained-html \
 		--junitxml=junit.xml \
 		--alluredir=allure-results
 
