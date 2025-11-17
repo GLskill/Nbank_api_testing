@@ -4,7 +4,8 @@ DOCKER_PASSWORD ?=
 IMAGE_NAME = $(DOCKER_USER)/python-test
 TAG = latest
 
-DOCKER_COMPOSE_FILE = docker-compose-full.yml
+# Путь к docker-compose файлу
+DOCKER_COMPOSE_FILE = infra/docker_compose/docker-compose.yml
 
 # Папка для результатов (с датой)
 TEST_OUTPUT_DIR ?= $(shell pwd)/test-results/$(shell date +"%Y-%m-%d_%H-%M-%S")
@@ -19,7 +20,7 @@ start-app:
 	@echo "Starting backend and frontend for CI..."
 	docker compose -f $(DOCKER_COMPOSE_FILE) up -d backend frontend
 	@echo "Waiting for services to be ready..."
-	sleep 10
+	sleep 15
 	@echo "Services started successfully"
 
 .PHONY: run-tests
@@ -84,14 +85,14 @@ logs-tests:
 test-external-services:
 	@echo "Running tests against external services..."
 	@echo "Backend: http://localhost:4111"
-	@echo "Frontend: http://localhost:3000"
+	@echo "Frontend: http://localhost:80"
 	docker run --rm --name test-runner \
 		--network host \
 		-v $(shell pwd)/test_results:/app/test_results \
 		-v $(shell pwd)/logs:/app/logs \
 		-e TEST_PROFILE=$(TEST_PROFILE) \
 		-e BASE_API_URL=http://localhost:4111/api \
-		-e BASE_UI_URL=http://localhost:3000 \
+		-e BASE_UI_URL=http://localhost:80 \
 		python-tests:latest
 
 # === LOCAL TESTING (без Docker) ===
@@ -101,7 +102,7 @@ run-tests-local:
 	@echo "Running tests locally..."
 	mkdir -p allure-results
 	export BASE_API_URL=http://localhost:4111/api && \
-	export BASE_UI_URL=http://localhost:3000 && \
+	export BASE_UI_URL=http://localhost:80 && \
 	pytest src/tests/$(TEST_PROFILE) -v \
 		--log-level=DEBUG \
 		--log-cli-level=DEBUG \
