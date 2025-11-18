@@ -2,7 +2,7 @@ import logging
 from time import sleep
 import pytest
 import requests
-from config import Config
+from src.main.api.configs.config import Config
 
 
 # === 1. Healthcheck бэкенда ===
