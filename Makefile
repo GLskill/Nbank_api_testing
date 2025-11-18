@@ -3,7 +3,7 @@ DOCKER_PASSWORD ?=
 IMAGE_NAME = $(DOCKER_USER)/python-test
 TAG = latest
 
-DOCKER_COMPOSE_FILE = infra/docker-compose/docker-compose.yml
+DOCKER_COMPOSE_FILE = infra/docker_compose/docker-compose.yml
 
 TEST_OUTPUT_DIR ?= test-results/$(shell date +"%Y%_m_%d_%H_%M")
 SERVER ?= http://localhost:4111/api
