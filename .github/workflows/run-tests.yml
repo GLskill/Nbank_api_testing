@@ -57,6 +57,9 @@ jobs:
           echo "=== Testing frontend via nginx ==="
           curl -v http://localhost:80 || echo "Nginx not ready"
           
+          echo "=== Testing frontend HTML content ==="
+          curl -s http://localhost:80 | head -20
+          
           echo "=== Nginx logs ==="
           docker logs nginx 2>&1 | tail -20
           
@@ -66,7 +69,7 @@ jobs:
       - name: Run tests
         env:
           BASE_API_URL: http://localhost:4111
-          BASE_UI_URL: http://localhost:3000
+          BASE_UI_URL: http://localhost:80
         run: make run-tests
 
       - name: Load test report history
