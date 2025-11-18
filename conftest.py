@@ -3,6 +3,7 @@ from src.main.api.fixtures.api_fixtures import *
 from src.main.api.fixtures.user_fixtures import *
 from src.main.api.fixtures.object_fixtures import *
 import requests
+from src.main.api.configs.config import Config
 
 
 @pytest.fixture(scope="session", autouse=True)
