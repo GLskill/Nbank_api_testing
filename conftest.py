@@ -2,7 +2,7 @@ import logging
 from time import sleep
 import pytest
 import requests
-from src.main.api.configs.config import Config
+from config import Config
 
 
 # === 1. Healthcheck бэкенда ===
@@ -21,12 +21,6 @@ def healthcheck():
         logging.info(f"Waiting for backend... ({i + 1}/30)")
         sleep(3)
     raise RuntimeError("Backend failed to start!")
-
-
-# === 2. Playwright фикстуры (обязательно!) ===
-pytest_plugins = [
-    "pytest_playwright.pytest_playwright",  # ← это включает browser, context, page
-]
 
 
 @pytest.fixture(scope="session")
