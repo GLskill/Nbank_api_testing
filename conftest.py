@@ -1,8 +1,18 @@
-from src.main.api.fixtures.user_fixtures import *
+from time import sleep
 from src.main.api.fixtures.api_fixtures import *
+from src.main.api.fixtures.user_fixtures import *
 from src.main.api.fixtures.object_fixtures import *
-from src.main.api.fixtures.deposit_fixtures import *
-from src.main.api.fixtures.transfer_fixtures import *
-from src.main.ui.fixtures.ui_browser_close_fixtures import *
-from src.main.ui.fixtures.base_steps_fixtures import *
+import requests
 
+
+@pytest.fixture(scope="session", autouse=True)
+def healthcheck():
+    logging.info("backend healthcheck")
+    for _ in range(5):
+        try:
+            requests.get(f"{Config.get('server')}")  # wait til connection can be established
+            return
+        except requests.exceptions.ConnectionError as e:
+            logging.error(e)
+        sleep(1)
+    raise AssertionError("backend health check failed")

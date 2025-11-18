@@ -1,117 +1,20 @@
-name: Run tests
+services:
+  backend:
+    image: nobugsme/nbank:with_username_error_fix
+    ports:
+      - "4111:4111"
+    networks:
+      - nbank-network
 
-on: [push, workflow_dispatch]
+  frontend:
+    image: nobugsme/nbank-ui:with_nginx
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - nbank-network
 
-# Добавляем permissions для работы с gh-pages
-permissions:
-  contents: write
-  pages: write
-  id-token: write
-
-jobs:
-  run-tests:
-    name: Setup services (review app) and run tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-          cache: 'pip'
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Setup playwright
-        run: playwright install --with-deps
-
-      - name: Run app
-        run: make start-app
-
-      - name: Wait for services to be ready
-        run: |
-          echo "Waiting for backend..."
-          for i in {1..30}; do
-            if curl -f http://localhost:4111/api/health 2>/dev/null; then
-              echo "Backend is ready"
-              break
-            fi
-            echo "Waiting... ($i/30)"
-            sleep 2
-          done
-          
-          echo "Waiting for nginx (frontend proxy)..."
-          for i in {1..30}; do
-            if curl -f http://localhost:80 2>/dev/null; then
-              echo "Nginx is ready"
-              break
-            fi
-            echo "Waiting... ($i/30)"
-            sleep 2
-          done
-
-      - name: Debug services
-        run: |
-          echo "=== Docker containers ==="
-          docker ps
-          
-          echo "=== Testing backend directly ==="
-          curl -v http://localhost:4111/api/health || echo "Backend not ready"
-          
-          echo "=== Testing frontend via nginx ==="
-          curl -v http://localhost:80 || echo "Nginx not ready"
-          
-          echo "=== Testing frontend HTML content ==="
-          curl -s http://localhost:80 | head -20
-          
-          echo "=== Nginx logs ==="
-          docker logs nginx 2>&1 | tail -20
-          
-          echo "=== Frontend logs ==="
-          docker logs nbank-frontend 2>&1 | tail -20
-
-      - name: Run tests
-        env:
-          BASE_API_URL: http://localhost:4111
-          BASE_UI_URL: http://localhost:80
-        run: make run-tests
-
-      - name: Load test report history
-        uses: actions/checkout@v5
-        if: always()
-        continue-on-error: true
-        with:
-          repository: ${{ github.repository }}
-          ref: gh-pages
-          path: gh-pages
-
-      - name: Build Allure report
-        uses: simple-elf/allure-report-action@master
-        if: always()
-        with:
-          allure_results: allure-results
-          gh_pages: gh-pages
-          allure_history: allure-history
-
-      - name: Fix allure-history permissions
-        if: always()
-        run: |
-          if [ -d "allure-history/.git" ]; then
-            sudo chmod -R 777 allure-history/.git
-            sudo rm -rf allure-history/.git
-          fi
-
-      - name: Publish test reports
-        uses: peaceiris/actions-gh-pages@v4
-        if: always()
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: allure-history
-          force_orphan: true
-
-      - name: Stop services
-        if: always()
-        run: make stop-app
+networks:
+  nbank-network:
+    name: nbank-network
