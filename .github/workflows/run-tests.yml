@@ -97,6 +97,7 @@ jobs:
           publish_branch: gh-pages
           publish_dir: allure-history
           keep_files: true
+          force_orphan: true
 
       - name: Stop services
         if: always()
