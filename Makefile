@@ -83,14 +83,14 @@ logs-tests:
 test-external-services:
 	@echo "Running tests against external services..."
 	@echo "Backend: http://localhost:4111"
-	@echo "Frontend: http://localhost:80"
+	@echo "Frontend: http://localhost:3000"
 	docker run --rm --name test-runner \
 		--network host \
 		-v $(shell pwd)/test_results:/app/test_results \
 		-v $(shell pwd)/logs:/app/logs \
 		-e TEST_PROFILE=$(TEST_PROFILE) \
 		-e BASE_API_URL=http://localhost:4111/api \
-		-e BASE_UI_URL=http://localhost:80 \
+		-e BASE_UI_URL=http://localhost:3000 \
 		python-tests:latest
 
 # === LOCAL TESTING (без Docker) ===

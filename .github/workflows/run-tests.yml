@@ -66,7 +66,7 @@ jobs:
       - name: Run tests
         env:
           BASE_API_URL: http://localhost:4111
-          BASE_UI_URL: http://localhost:80
+          BASE_UI_URL: http://localhost:3000
         run: make run-tests
 
       - name: Load test report history
