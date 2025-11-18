@@ -2,6 +2,12 @@ name: Run tests
 
 on: [push, workflow_dispatch]
 
+# Добавляем permissions для работы с gh-pages
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   run-tests:
     name: Setup services (review app) and run tests
