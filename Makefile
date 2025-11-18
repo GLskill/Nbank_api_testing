@@ -100,7 +100,7 @@ run-tests-local:
 	@echo "Running tests locally..."
 	mkdir -p allure-results
 	export BASE_API_URL=http://localhost:4111 && \
-	export BASE_UI_URL=http://localhost:80 && \
+	export BASE_UI_URL=http://localhost:3000 && \
 	pytest src/tests/$(TEST_PROFILE) -v \
 		--log-level=DEBUG \
 		--log-cli-level=DEBUG \
