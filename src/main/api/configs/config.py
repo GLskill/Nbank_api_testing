@@ -10,27 +10,24 @@ class Config:
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(Config, cls).__new__(cls)
-            config_path = Path(__file__).parents[4] / 'resources' / 'config.properties'
+            config_path = Path(__file__).parents[3] / 'resources' / 'config.properties'
             if not config_path.exists():
-                raise ImportError(f'{config_path}: config.properties not found')
+                raise ImportError(f'Config file not found: {config_path}')
             with open(config_path, 'r') as f:
                 for line in f:
                     if '=' in line:
-                        key, value = line.strip().split('=', 1)
-                        cls._properties[key] = value
+                        key, value = line.split('=', 1)
+                        cls._properties[key.strip()] = value.strip()
         return cls._instance
 
     @staticmethod
-    def get(key: str, default_value: Any = None) -> Any:
-        env_mapping = {
-            'frontendUrl': 'BASE_UI_URL',
-            'backendUrl': 'BASE_API_URL',
-            'server': 'BASE_API_URL',
-        }
-        env_key = env_mapping.get(key)
-        if env_key:
-            env_value = os.getenv(env_key)
-            if env_value:
-                return env_value
-
+    def get(key: str, default_value: Any = None):
+        """
+        Return environment variable value is set (key = KEY), if not searches for key in config.properties
+        If nothing is found, returns default_value
+        """
+        env_value = os.environ.get(key.upper())
+        if env_value:
+            return env_value
         return Config()._properties.get(key, default_value)
+
