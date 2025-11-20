@@ -57,5 +57,5 @@ def deposit_setup(api_manager):
 
 @pytest.fixture()
 def transfer_setup(api_manager):
-    # То же самое
-    return deposit_setup(api_manager)  # или свой код
+    return deposit_setup(api_manager)
+
