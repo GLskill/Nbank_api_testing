@@ -73,7 +73,6 @@ jobs:
           BASE_API_URL: http://localhost:4111
           BASE_UI_URL: http://localhost:3000
         run: |
-          python generate_config.py
           make run-tests
 
       - name: Load test report history
