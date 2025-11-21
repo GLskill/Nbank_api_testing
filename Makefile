@@ -21,7 +21,7 @@ start-app:
 	@echo "Starting backend and frontend for CI..."
 	docker compose -f $(DOCKER_COMPOSE_FILE) up -d backend frontend
 	@echo "Waiting for services to be ready..."
-	sleep 20
+	@sleep 20
 	@echo "Services started successfully"
 
 .PHONY: run-tests
@@ -29,7 +29,8 @@ run-tests:
 	@echo "Running tests with:"
 	@echo "  BASE_API_URL = $(BASE_API_URL)"
 	@echo "  BASE_UI_URL = $(BASE_UI_URL)"
-	mkdir -p allure-results
+	@mkdir -p allure-results
+	BASE_API_URL=$(BASE_API_URL) BASE_UI_URL=$(BASE_UI_URL) \
 	pytest src/tests/ -v \
 		--log-level=DEBUG \
 		--log-cli-level=DEBUG \
@@ -56,15 +57,49 @@ run-tests-local: start-services-local
 	@echo "Waiting for services..."
 	@sleep 10
 	@echo "Running tests locally (port 3000)..."
-	mkdir -p allure-results
-	BASE_API_URL=http://localhost:4111 \
-	BASE_UI_URL=http://localhost:3000 \
+	@mkdir -p allure-results
+	BASE_API_URL=http://localhost:4111 BASE_UI_URL=http://localhost:3000 \
 	pytest src/tests/ -v \
 		--log-level=DEBUG \
 		--log-cli-level=DEBUG \
 		--junitxml=junit.xml \
 		--alluredir=allure-results
 	@$(MAKE) stop-app
+
+# === БЫСТРЫЙ ЗАПУСК БЕЗ DOCKER (для разработки) ===
+
+.PHONY: test-local-quick
+test-local-quick:
+	@echo "Running tests (assumes services are already running)..."
+	@mkdir -p allure-results
+	BASE_API_URL=http://localhost:4111 BASE_UI_URL=http://localhost:3000 \
+	pytest src/tests/ -v \
+		--log-level=DEBUG \
+		--log-cli-level=DEBUG \
+		--junitxml=junit.xml \
+		--alluredir=allure-results
+
+.PHONY: test-api-only
+test-api-only:
+	@echo "Running API tests only..."
+	@mkdir -p allure-results
+	BASE_API_URL=http://localhost:4111 BASE_UI_URL=http://localhost:3000 \
+	pytest src/tests/api/ -v \
+		--log-level=DEBUG \
+		--log-cli-level=DEBUG \
+		--junitxml=junit.xml \
+		--alluredir=allure-results
+
+.PHONY: test-ui-only
+test-ui-only:
+	@echo "Running UI tests only..."
+	@mkdir -p allure-results
+	BASE_API_URL=http://localhost:4111 BASE_UI_URL=http://localhost:3000 \
+	pytest src/tests/ui/ -v \
+		--log-level=DEBUG \
+		--log-cli-level=DEBUG \
+		--junitxml=junit.xml \
+		--alluredir=allure-results
 
 # === DOCKER COMPOSE - ОСНОВНОЙ СПОСОБ ЗАПУСКА ===
 
@@ -117,6 +152,17 @@ allure-serve:
 allure-stop:
 	docker compose -f $(DOCKER_COMPOSE_FILE) stop allure
 
+.PHONY: allure-generate
+allure-generate:
+	@echo "Generating Allure report..."
+	allure generate allure-results --clean -o allure-report
+	@echo "Report generated in allure-report/"
+
+.PHONY: allure-open
+allure-open:
+	@echo "Opening Allure report..."
+	allure open allure-report
+
 # === UTILS ===
 
 .PHONY: clean
@@ -125,28 +171,40 @@ clean:
 	rm -rf test_results/ test-results/
 	rm -f html_report.html junit.xml
 	rm -rf allure-results/
+	rm -rf allure-report/
 	rm -rf logs/
+	rm -rf .pytest_cache/
+	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 
 .PHONY: help
 help:
 	@echo "Available commands:"
 	@echo ""
-	@echo "Local testing (PyCharm):"
-	@echo "  make run-tests-local       - Start services on port 3000 and run tests"
-	@echo "  make start-services-local  - Start only backend + frontend (port 3000)"
+	@echo "=== Разработка (PyCharm) ==="
+	@echo "  make start-services-local  - Запустить backend + frontend (порт 3000)"
+	@echo "  make test-local-quick      - Запустить тесты (сервисы уже работают)"
+	@echo "  make test-api-only         - Только API тесты"
+	@echo "  make test-ui-only          - Только UI тесты"
+	@echo "  make run-tests-local       - Запустить сервисы + тесты + остановить"
 	@echo ""
-	@echo "GitHub Actions (CI):"
-	@echo "  make start-app             - Start services with nginx (port 80)"
-	@echo "  make run-tests             - Run tests (uses BASE_UI_URL from env)"
-	@echo "  make stop-app              - Stop all services"
+	@echo "=== GitHub Actions (CI) ==="
+	@echo "  make start-app             - Запустить сервисы для CI"
+	@echo "  make run-tests             - Запустить тесты (использует BASE_UI_URL)"
+	@echo "  make stop-app              - Остановить все сервисы"
 	@echo ""
-	@echo "Docker Compose:"
-	@echo "  make test-all              - Run all tests in Docker"
-	@echo "  make test-api              - Run API tests only"
-	@echo "  make test-ui               - Run UI tests only"
-	@echo "  make start-services        - Start backend and frontend"
-	@echo "  make stop-all              - Stop all services"
+	@echo "=== Docker Compose ==="
+	@echo "  make test-all              - Запустить все тесты в Docker"
+	@echo "  make test-api              - Только API тесты"
+	@echo "  make test-ui               - Только UI тесты"
+	@echo "  make start-services        - Запустить backend и frontend"
+	@echo "  make stop-all              - Остановить все сервисы"
 	@echo ""
-	@echo "Other:"
-	@echo "  make allure-serve          - Start Allure report server"
-	@echo "  make clean                 - Clean test results"
+	@echo "=== Allure Reports ==="
+	@echo "  make allure-generate       - Сгенерировать Allure отчёт"
+	@echo "  make allure-open           - Открыть Allure отчёт в браузере"
+	@echo "  make allure-serve          - Запустить Allure server (Docker)"
+	@echo ""
+	@echo "=== Другое ==="
+	@echo "  make clean                 - Очистить результаты тестов"
+	@echo "  make logs-backend          - Логи backend"
+	@echo "  make logs-frontend         - Логи frontend"
