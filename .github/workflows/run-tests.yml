@@ -41,20 +41,75 @@ jobs:
             sleep 2
           done
           
-          echo "Waiting for nginx (frontend proxy)..."
+          echo "Waiting for frontend..."
           for i in {1..30}; do
-            if curl -f http://localhost:80 2>/dev/null; then
-              echo "Nginx is ready"
+            if curl -f http://localhost:3000 2>/dev/null; then
+              echo "Frontend is ready"
               break
             fi
             echo "Waiting... ($i/30)"
             sleep 2
           done
 
+      - name: Debug services
+        run: |
+          echo "=== Docker containers ==="
+          docker ps
+          
+          echo "=== Testing backend ==="
+          curl -v http://localhost:4111/api/health || echo "Backend not ready"
+          
+          echo "=== Testing frontend ==="
+          curl -v http://localhost:3000 || echo "Frontend not ready"
+          
+          echo "=== Backend logs ==="
+          docker logs nbank-backend 2>&1 | tail -20
+          
+          echo "=== Frontend logs ==="
+          docker logs nbank-frontend 2>&1 | tail -20
+
       - name: Run tests
         env:
           BASE_API_URL: http://localhost:4111
-          BASE_UI_URL: http://localhost:80
-        run: make run-tests
+          BASE_UI_URL: http://localhost:3000
+        run: |
+          python generate_config.py
+          make run-tests
 
-      # ... остальные шаги без изменений
+      - name: Load test report history
+        uses: actions/checkout@v5
+        if: always()
+        continue-on-error: true
+        with:
+          repository: ${{ github.repository }}
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Build Allure report
+        uses: simple-elf/allure-report-action@master
+        if: always()
+        with:
+          allure_results: allure-results
+          gh_pages: gh-pages
+          allure_history: allure-history
+
+      - name: Fix allure-history permissions
+        if: always()
+        run: |
+          if [ -d "allure-history/.git" ]; then
+            sudo chmod -R 777 allure-history/.git
+            sudo rm -rf allure-history/.git
+          fi
+
+      - name: Publish test reports
+        uses: peaceiris/actions-gh-pages@v4
+        if: always()
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: allure-history
+          force_orphan: true
+
+      - name: Stop services
+        if: always()
+        run: make stop-app

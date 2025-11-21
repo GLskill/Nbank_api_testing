@@ -18,8 +18,8 @@ BASE_UI_URL ?= http://localhost:3000
 
 .PHONY: start-app
 start-app:
-	@echo "Starting backend, frontend and nginx for CI..."
-	docker compose -f $(DOCKER_COMPOSE_FILE) up -d backend frontend nginx
+	@echo "Starting backend and frontend for CI..."
+	docker compose -f $(DOCKER_COMPOSE_FILE) up -d backend frontend
 	@echo "Waiting for services to be ready..."
 	sleep 20
 	@echo "Services started successfully"
@@ -29,6 +29,8 @@ run-tests:
 	@echo "Running tests with:"
 	@echo "  BASE_API_URL = $(BASE_API_URL)"
 	@echo "  BASE_UI_URL = $(BASE_UI_URL)"
+	@echo "Generating config.properties..."
+	@python generate_config.py
 	mkdir -p allure-results
 	pytest src/tests/ -v \
 		--log-level=DEBUG \
