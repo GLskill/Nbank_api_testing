@@ -29,8 +29,6 @@ run-tests:
 	@echo "Running tests with:"
 	@echo "  BASE_API_URL = $(BASE_API_URL)"
 	@echo "  BASE_UI_URL = $(BASE_UI_URL)"
-	@echo "Generating config.properties..."
-	@python generate_config.py
 	mkdir -p allure-results
 	pytest src/tests/ -v \
 		--log-level=DEBUG \
