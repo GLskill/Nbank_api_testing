@@ -26,52 +26,60 @@ jobs:
       - name: Setup playwright
         run: playwright install --with-deps
 
-      - name: Run app
-        run: make start-app
+      - name: Run app with nginx
+        run: |
+          echo "Starting all services (backend, frontend, nginx)..."
+          docker compose -f infra/docker_compose/docker-compose.yml up -d backend frontend nginx
 
       - name: Wait for services to be ready
         run: |
           echo "Waiting for backend..."
           for i in {1..30}; do
             if curl -f http://localhost:4111/api/health 2>/dev/null; then
-              echo "Backend is ready"
+              echo "✓ Backend is ready"
               break
             fi
-            echo "Waiting... ($i/30)"
+            echo "Waiting for backend... ($i/30)"
             sleep 2
           done
           
-          echo "Waiting for frontend..."
+          echo "Waiting for frontend (via nginx)..."
           for i in {1..30}; do
-            if curl -f http://localhost:3000 2>/dev/null; then
-              echo "Frontend is ready"
+            if curl -f http://localhost:80 2>/dev/null; then
+              echo "✓ Frontend is ready (nginx)"
               break
             fi
-            echo "Waiting... ($i/30)"
+            echo "Waiting for frontend... ($i/30)"
             sleep 2
           done
+          
+          echo "Checking if nginx is proxying correctly..."
+          curl -I http://localhost:80 || echo "Warning: nginx might not be ready"
 
       - name: Debug services
         run: |
           echo "=== Docker containers ==="
           docker ps
           
-          echo "=== Testing backend ==="
+          echo "=== Testing backend directly ==="
           curl -v http://localhost:4111/api/health || echo "Backend not ready"
           
-          echo "=== Testing frontend ==="
-          curl -v http://localhost:3000 || echo "Frontend not ready"
+          echo "=== Testing frontend via nginx ==="
+          curl -I http://localhost:80 || echo "Nginx not ready"
           
           echo "=== Backend logs ==="
-          docker logs nbank-backend 2>&1 | tail -20
+          docker logs nbank-backend 2>&1 | tail -30
           
           echo "=== Frontend logs ==="
-          docker logs nbank-frontend 2>&1 | tail -20
+          docker logs nbank-frontend 2>&1 | tail -30
+          
+          echo "=== Nginx logs ==="
+          docker logs nginx 2>&1 | tail -30
 
       - name: Run tests
         env:
           BASE_API_URL: http://localhost:4111
-          BASE_UI_URL: http://localhost:3000
+          BASE_UI_URL: http://localhost:80
         run: |
           make run-tests
 
@@ -111,4 +119,4 @@ jobs:
 
       - name: Stop services
         if: always()
-        run: make stop-app
+        run: docker compose -f infra/docker_compose/docker-compose.yml down

@@ -18,11 +18,13 @@ BASE_UI_URL ?= http://localhost:3000
 
 .PHONY: start-app
 start-app:
-	@echo "Starting backend and frontend for CI..."
-	docker compose -f $(DOCKER_COMPOSE_FILE) up -d backend frontend
+	@echo "Starting backend, frontend and nginx for CI..."
+	docker compose -f $(DOCKER_COMPOSE_FILE) up -d backend frontend nginx
 	@echo "Waiting for services to be ready..."
 	@sleep 20
 	@echo "Services started successfully"
+	@echo "  Backend:  http://localhost:4111"
+	@echo "  Frontend: http://localhost:80 (via nginx)"
 
 .PHONY: run-tests
 run-tests:
@@ -41,6 +43,7 @@ run-tests:
 stop-app:
 	@echo "Stopping services..."
 	docker compose -f $(DOCKER_COMPOSE_FILE) down
+	@echo "Services stopped"
 
 # === ЛОКАЛЬНЫЙ ЗАПУСК (БЕЗ NGINX, ПОРТ 3000) ===
 
@@ -164,6 +167,16 @@ allure-open:
 	allure open allure-report
 
 # === UTILS ===
+
+.PHONY: check-services
+check-services:
+	@echo "Checking services availability..."
+	@echo -n "Backend (API): "
+	@curl -s -o /dev/null -w "%{http_code}" http://localhost:4111/api/health || echo "FAIL"
+	@echo -n "Frontend (direct): "
+	@curl -s -o /dev/null -w "%{http_code}" http://localhost:3000 || echo "FAIL"
+	@echo -n "Frontend (nginx): "
+	@curl -s -o /dev/null -w "%{http_code}" http://localhost:80 || echo "FAIL"
 
 .PHONY: clean
 clean:
