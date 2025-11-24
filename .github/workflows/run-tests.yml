@@ -22,11 +22,29 @@ jobs:
 
       - run: playwright install --with-deps
 
-      - run: docker compose -f infra/docker_compose/docker-compose.yml up -d backend frontend nginx
+      - run: |
+          docker compose -f infra/docker_compose/docker-compose.yml up -d backend frontend nginx
+          sleep 10
+          docker ps
+          docker compose -f infra/docker_compose/docker-compose.yml logs backend
+          docker compose -f infra/docker_compose/docker-compose.yml logs frontend
+          docker compose -f infra/docker_compose/docker-compose.yml logs nginx
 
       - run: |
-          until curl -f http://localhost:4111/api/health 2>/dev/null; do sleep 2; done
-          until curl -f http://localhost:80 2>/dev/null; do sleep 2; done
+          for i in {1..60}; do 
+            if curl -f http://localhost:4111/api/health 2>/dev/null; then
+              echo "Backend ready"
+              break
+            fi
+            sleep 2
+          done
+          for i in {1..60}; do
+            if curl -f http://localhost:80 2>/dev/null; then
+              echo "Frontend ready"
+              break
+            fi
+            sleep 2
+          done
 
       - run: make run-tests
         env:
