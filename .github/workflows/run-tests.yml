@@ -24,16 +24,9 @@ jobs:
 
       - run: docker compose -f infra/docker_compose/docker-compose.yml up -d backend frontend nginx
 
-      - name: Wait for services
-        run: |
-          for i in {1..30}; do
-            curl -f http://localhost:4111/api/health 2>/dev/null && break
-            sleep 2
-          done
-          for i in {1..30}; do
-            curl -f http://localhost:80 2>/dev/null && break
-            sleep 2
-          done
+      - run: |
+          until curl -f http://localhost:4111/api/health 2>/dev/null; do sleep 2; done
+          until curl -f http://localhost:80 2>/dev/null; do sleep 2; done
 
       - run: make run-tests
         env:
