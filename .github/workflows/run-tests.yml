@@ -22,33 +22,47 @@ jobs:
 
       - run: playwright install --with-deps
 
-      - run: |
+      - name: Start services
+        run: |
           docker compose -f infra/docker_compose/docker-compose.yml up -d backend frontend
-          sleep 10
+          sleep 15
+
+      - name: Check services
+        run: |
           docker ps
           docker compose -f infra/docker_compose/docker-compose.yml logs backend
           docker compose -f infra/docker_compose/docker-compose.yml logs frontend
 
-      - run: |
+      - name: Wait for services to be ready
+        run: |
+          echo "Waiting for backend..."
           for i in {1..60}; do 
             if curl -f http://localhost:4111/api/health 2>/dev/null; then
-              echo "Backend ready"
+              echo "✓ Backend ready"
               break
             fi
+            echo "Attempt $i/60..."
             sleep 2
           done
+          
+          echo "Waiting for frontend..."
           for i in {1..60}; do
             if curl -f http://localhost:3000 2>/dev/null; then
-              echo "Frontend ready"
+              echo "✓ Frontend ready"
               break
             fi
+            echo "Attempt $i/60..."
             sleep 2
           done
 
-      - run: make run-tests
+      - name: Run tests
         env:
+          SERVER: http://localhost:4111/api
+          API_VERSION: /v1
+          UI_BASE_URL: http://localhost:3000
           BASE_API_URL: http://localhost:4111
           BASE_UI_URL: http://localhost:3000
+        run: make run-tests
 
       - uses: actions/checkout@v5
         if: always()
@@ -78,5 +92,6 @@ jobs:
           publish_dir: allure-history
           force_orphan: true
 
-      - run: docker compose -f infra/docker_compose/docker-compose.yml down
+      - name: Stop services
         if: always()
+        run: docker compose -f infra/docker_compose/docker-compose.yml down
