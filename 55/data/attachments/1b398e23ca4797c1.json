@@ -1,0 +1,11 @@
+{
+  "status_code": 200,
+  "body": [
+    {
+      "id": 5,
+      "accountNumber": "ACC5",
+      "balance": 0.0,
+      "transactions": []
+    }
+  ]
+}
