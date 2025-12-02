@@ -1,0 +1,10 @@
+
+==================================================
+UI TEST CONFIGURATION
+==================================================
+Frontend URL: http://localhost:3000
+Backend URL:  http://localhost:4111/api/v1
+Browser:      chromium
+Headless:     True
+==================================================
+

@@ -1,0 +1,1 @@
+WARNING  root:object_fixtures.py:22 Object type: <class 'src.main.api.models.transfer_response.TransferResponse'> is not deleted

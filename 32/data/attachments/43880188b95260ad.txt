@@ -1,0 +1,11 @@
+
+==================================================
+UI TEST CONFIGURATION
+==================================================
+Frontend URL: http://localhost:80
+Backend URL:  http://localhost:4111/api/v1
+Browser:      chromium
+Headless:     True
+==================================================
+
+[ALERT MESSAGE] ✅ User created successfully!

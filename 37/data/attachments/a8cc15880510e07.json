@@ -1,0 +1,14 @@
+{
+  "id": 4,
+  "accountNumber": "ACC4",
+  "balance": 49.19841745655456,
+  "transactions": [
+    {
+      "id": 4,
+      "amount": 49.19841745655456,
+      "type": "TRANSFER_IN",
+      "timestamp": "Tue Dec 02 10:43:58 UTC 2025",
+      "relatedAccountId": 3
+    }
+  ]
+}

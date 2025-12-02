@@ -1,0 +1,8 @@
+{
+  "id": 3,
+  "accountNumber": "ACC3",
+  "balance": 1547.0421171051082,
+  "transactions": [
+    "id=2 amount=1547.0421171051082 type='DEPOSIT' timestamp='Tue Dec 02 10:38:43 UTC 2025' relatedAccountId=3"
+  ]
+}

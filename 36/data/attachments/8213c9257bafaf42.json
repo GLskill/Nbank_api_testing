@@ -1,0 +1,19 @@
+{
+  "status_code": 200,
+  "body": [
+    {
+      "id": 4,
+      "accountNumber": "ACC4",
+      "balance": 773.5210585525541,
+      "transactions": [
+        {
+          "id": 4,
+          "amount": 773.5210585525541,
+          "type": "TRANSFER_IN",
+          "timestamp": "Tue Dec 02 10:38:43 UTC 2025",
+          "relatedAccountId": 3
+        }
+      ]
+    }
+  ]
+}

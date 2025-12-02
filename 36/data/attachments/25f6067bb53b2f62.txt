@@ -1,0 +1,2 @@
+[ALERT MESSAGE] ✅ New Account Created! Account Number: ACC5
+[DEBUG] Accounts from API: [{'id': 5, 'accountNumber': 'ACC5', 'balance': 0.0, 'transactions': []}]

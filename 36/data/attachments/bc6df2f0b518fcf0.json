@@ -1,0 +1,13 @@
+{
+  "status_code": 200,
+  "body": [
+    {
+      "id": 2,
+      "username": "BWuDub",
+      "password": "$2a$10$2m3N5w8bUV.rfEZq05ZcU.Hv73wygJh0gMXRsZTpnXMsjZING.sda",
+      "name": null,
+      "role": "USER",
+      "accounts": []
+    }
+  ]
+}

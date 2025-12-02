@@ -1,0 +1,12 @@
+DEBUG    urllib3.connectionpool:connectionpool.py:241 Starting new HTTP connection (1): localhost:4111
+DEBUG    urllib3.connectionpool:connectionpool.py:544 http://localhost:4111 "POST /api/v1/admin/users HTTP/1.1" 201 None
+DEBUG    urllib3.connectionpool:connectionpool.py:241 Starting new HTTP connection (1): localhost:4111
+DEBUG    urllib3.connectionpool:connectionpool.py:544 http://localhost:4111 "POST /api/v1/auth/login HTTP/1.1" 200 None
+DEBUG    urllib3.connectionpool:connectionpool.py:241 Starting new HTTP connection (1): localhost:4111
+DEBUG    urllib3.connectionpool:connectionpool.py:544 http://localhost:4111 "POST /api/v1/accounts HTTP/1.1" 201 None
+DEBUG    urllib3.connectionpool:connectionpool.py:241 Starting new HTTP connection (1): localhost:4111
+DEBUG    urllib3.connectionpool:connectionpool.py:544 http://localhost:4111 "POST /api/v1/auth/login HTTP/1.1" 200 None
+DEBUG    urllib3.connectionpool:connectionpool.py:241 Starting new HTTP connection (1): localhost:4111
+DEBUG    urllib3.connectionpool:connectionpool.py:544 http://localhost:4111 "GET /api/v1/customer/accounts HTTP/1.1" 200 None
+DEBUG    urllib3.connectionpool:connectionpool.py:241 Starting new HTTP connection (1): localhost:4111
+DEBUG    urllib3.connectionpool:connectionpool.py:544 http://localhost:4111 "DELETE /api/v1/admin/users/1 HTTP/1.1" 200 36

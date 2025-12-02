@@ -1,0 +1,1 @@
+ERROR    root:conftest.py:84 ❌ Backend health check failed after 10 attempts: http://localhost:4111/api/health
