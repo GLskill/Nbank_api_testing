@@ -1,0 +1,4 @@
+[DEBUG] Creating page objects with frontend_url: http://localhost:3000
+[ALERT MESSAGE] ❌ Failed to create user:
+
+• username: Username must be between 3 and 15 characters

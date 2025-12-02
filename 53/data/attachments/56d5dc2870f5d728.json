@@ -1,0 +1,13 @@
+{
+  "status_code": 200,
+  "body": [
+    {
+      "id": 7,
+      "username": "Cl9z",
+      "password": "$2a$10$5zvgnUoDsR8l3fOqPtupx.glhYITRAh4GYGO/IGQZFdmVYhyzYTMq",
+      "name": null,
+      "role": "USER",
+      "accounts": []
+    }
+  ]
+}
