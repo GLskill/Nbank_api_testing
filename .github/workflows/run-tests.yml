@@ -23,12 +23,11 @@ jobs:
       - run: playwright install --with-deps
 
       - run: |
-          docker compose -f infra/docker_compose/docker-compose.yml up -d backend frontend nginx
+          docker compose -f infra/docker_compose/docker-compose.yml up -d backend frontend
           sleep 10
           docker ps
           docker compose -f infra/docker_compose/docker-compose.yml logs backend
           docker compose -f infra/docker_compose/docker-compose.yml logs frontend
-          docker compose -f infra/docker_compose/docker-compose.yml logs nginx
 
       - run: |
           for i in {1..60}; do 
@@ -39,7 +38,7 @@ jobs:
             sleep 2
           done
           for i in {1..60}; do
-            if curl -f http://localhost:80 2>/dev/null; then
+            if curl -f http://localhost:3000 2>/dev/null; then
               echo "Frontend ready"
               break
             fi
@@ -49,7 +48,7 @@ jobs:
       - run: make run-tests
         env:
           BASE_API_URL: http://localhost:4111
-          BASE_UI_URL: http://localhost:80
+          BASE_UI_URL: http://localhost:3000
 
       - uses: actions/checkout@v5
         if: always()

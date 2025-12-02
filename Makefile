@@ -5,6 +5,11 @@ BASE_UI_URL ?= http://localhost:3000
 # GitHub Actions
 .PHONY: start-app
 start-app:
+	docker compose -f $(DOCKER_COMPOSE_FILE) up -d backend frontend
+	@sleep 20
+
+.PHONY: start-app-with-nginx
+start-app-with-nginx:
 	docker compose -f $(DOCKER_COMPOSE_FILE) up -d backend frontend nginx
 	@sleep 20
 
@@ -37,7 +42,7 @@ test-ui-only:
 	BASE_API_URL=http://localhost:4111 BASE_UI_URL=http://localhost:3000 \
 	pytest src/tests/ui/ -v --alluredir=allure-results
 
-# Services
+# Services for local development (port 3000)
 .PHONY: start-services
 start-services:
 	docker compose -f $(DOCKER_COMPOSE_FILE) up -d backend frontend
