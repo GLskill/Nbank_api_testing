@@ -1,0 +1,83 @@
+name: Run tests
+
+on: [push, workflow_dispatch]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+
+      - run: pip install -r requirements.txt
+
+      - run: playwright install --with-deps
+
+      - run: |
+          docker compose -f infra/docker_compose/docker-compose.yml up -d backend frontend nginx
+          sleep 10
+          docker ps
+          docker compose -f infra/docker_compose/docker-compose.yml logs backend
+          docker compose -f infra/docker_compose/docker-compose.yml logs frontend
+          docker compose -f infra/docker_compose/docker-compose.yml logs nginx
+
+      - run: |
+          for i in {1..60}; do 
+            if curl -f http://localhost:4111/api/health 2>/dev/null; then
+              echo "Backend ready"
+              break
+            fi
+            sleep 2
+          done
+          for i in {1..60}; do
+            if curl -f http://localhost:80 2>/dev/null; then
+              echo "Frontend ready"
+              break
+            fi
+            sleep 2
+          done
+
+      - run: make run-tests
+        env:
+          BASE_API_URL: http://localhost:4111
+          BASE_UI_URL: http://localhost:80
+
+      - uses: actions/checkout@v5
+        if: always()
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      - uses: simple-elf/allure-report-action@master
+        if: always()
+        with:
+          allure_results: allure-results
+          gh_pages: gh-pages
+          allure_history: allure-history
+
+      - run: |
+          if [ -d "allure-history/.git" ]; then
+            sudo rm -rf allure-history/.git
+          fi
+        if: always()
+
+      - uses: peaceiris/actions-gh-pages@v4
+        if: always()
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: allure-history
+          force_orphan: true
+
+      - run: docker compose -f infra/docker_compose/docker-compose.yml down
+        if: always()

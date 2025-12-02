@@ -2,6 +2,8 @@ import json
 
 import pytest
 from playwright.sync_api import sync_playwright
+
+from src.main.ui.page_object.user_deposit_money_page import UserDepositMoneyPage
 from src.main.ui.page_object.admin_panel_page import AdminPanel
 from src.main.ui.page_object.login_page import LoginPage
 from src.main.ui.page_object.user_page import UserPage
@@ -36,5 +38,6 @@ def page_objects(browser_context, config):
     return {
         "login": LoginPage(browser_context, config["frontend_url"]),
         "admin": AdminPanel(browser_context, config["frontend_url"]),
-        "dashboard": UserPage(browser_context, config["frontend_url"])
+        "dashboard": UserPage(browser_context, config["frontend_url"]),
+        "deposit": UserDepositMoneyPage(browser_context, config["frontend_url"])
     }

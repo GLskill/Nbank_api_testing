@@ -4,9 +4,11 @@ from src.main.api.requests.deposit_reqester import DepositRequester
 from src.main.api.specs.request_specs import RequestSpecs
 from src.main.api.specs.response_specs import ResponseSpecs
 from src.main.api.steps.base_steps import BaseSteps
+from src.main.api.helpers.allure_helpers import allure_step
 
 
 class DepositSteps(BaseSteps):
+    @allure_step("Make deposit: {amount} to account {account_id} by user {username}")
     def make_deposit(self, account_id: str, amount: float, username: str, password: str) -> DepositResponse:
         deposit_request = DepositRequest(id=account_id, balance=amount)
         deposit_response = DepositRequester(
