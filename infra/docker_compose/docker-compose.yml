@@ -20,3 +20,5 @@ services:
       - backend
     networks:
       - nbank-network
+    environment:
+      - API_BASE_URL=http://backend:4111

@@ -47,13 +47,22 @@ jobs:
           
           echo "Waiting for frontend..."
           for i in {1..60}; do
-            if curl -f http://localhost:3000 2>/dev/null; then
+            if curl -s http://localhost:3000 2>/dev/null | grep -q "html"; then
               echo "✓ Frontend ready"
               break
             fi
             echo "Attempt $i/60..."
             sleep 2
           done
+          
+          echo ""
+          echo "=== Final verification ==="
+          echo "Backend health:"
+          curl -s http://localhost:4111/api/health || echo "Backend unreachable"
+          echo ""
+          echo "Frontend response (first 500 chars):"
+          curl -s http://localhost:3000 | head -c 500
+          echo ""
 
       - name: Run tests
         env:
