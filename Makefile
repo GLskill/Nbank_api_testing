@@ -1,58 +1,91 @@
-DOCKER_COMPOSE_FILE = infra/docker_compose/docker-compose.yml
-BASE_API_URL ?= http://localhost:4111
-BASE_UI_URL ?= http://localhost:3000
+DOCKER_USER ?=
+DOCKER_PASSWORD ?=
+IMAGE_NAME = $(DOCKER_USER)/python-test
+TAG = latest
 
-# GitHub Actions
-.PHONY: start-app
-start-app:
-	docker compose -f $(DOCKER_COMPOSE_FILE) up -d backend frontend
-	@sleep 20
+DOCKER_COMPOSE_FILE = infra/docker-compose/docker-compose.yml
 
-.PHONY: start-app-with-nginx
-start-app-with-nginx:
-	docker compose -f $(DOCKER_COMPOSE_FILE) up -d backend frontend nginx
-	@sleep 20
+TEST_OUTPUT_DIR ?= test-results/$(shell date +"%Y%_m_%d_%H_%M")
+SERVER ?= http://localhost:4111/api
+UI_BASE_URL ?= http://localhost:3000
 
-.PHONY: run-tests
-run-tests:
-	@mkdir -p allure-results
-	BASE_API_URL=$(BASE_API_URL) BASE_UI_URL=$(BASE_UI_URL) \
-	pytest src/tests/ -v --alluredir=allure-results
+# DOCKER IMAGE
+.PHONY: build-docker-container
+build-docker-container:
+	@echo "going to build docker container with tests"
+	docker buildx create --use
+	docker buildx build --platform linux/amd64,linux/arm64 -t $(IMAGE_NAME):$(TAG) .
 
+.PHONY: run-docker-container
+run-docker-container:
+	@echo "going to run docker container with tests"
+	mkdir -p $(TEST_OUTPUT_DIR)
+	docker run --rm --name test-runner \
+		   --platform linux/amd64 \
+		   --network host \
+		   -v $(shell pwd)/$(TEST_OUTPUT_DIR)/allure-results:/app/allure-results \
+		   -e SERVER=$(SERVER) -e UI_BASE_URL=$(UI_BASE_URL) \
+           $(IMAGE_NAME):$(TAG)
+	@echo "tests finished, check results in $(TEST_OUTPUT_DIR)"
+
+.PHONY: publish-docker-container
+publish-docker-container:
+	echo $(DOCKER_PASSWORD) | docker login -u $(DOCKER_USER) --password-stdin
+	docker buildx build --push --platform linux/amd64,linux/arm64 -t $(IMAGE_NAME):$(TAG) .
+
+# DOCKER COMPOSE
 .PHONY: stop-app
 stop-app:
 	docker compose -f $(DOCKER_COMPOSE_FILE) down
 
-# Local development
-.PHONY: test-local-quick
-test-local-quick:
-	@mkdir -p allure-results
-	BASE_API_URL=http://localhost:4111 BASE_UI_URL=http://localhost:3000 \
-	pytest src/tests/ -v --alluredir=allure-results
+.PHONY: start-app
+start-app:
+	make stop-app
+	docker compose -f $(DOCKER_COMPOSE_FILE) up -d
 
-.PHONY: test-api-only
-test-api-only:
-	@mkdir -p allure-results
-	BASE_API_URL=http://localhost:4111 BASE_UI_URL=http://localhost:3000 \
-	pytest src/tests/api/ -v --alluredir=allure-results
+# RUN TESTS
+.PHONY: run-tests
+run-tests:
+	pytest -v --log-level=DEBUG --log-cli-level=DEBUG --alluredir allure-results
 
-.PHONY: test-ui-only
-test-ui-only:
-	@mkdir -p allure-results
-	BASE_API_URL=http://localhost:4111 BASE_UI_URL=http://localhost:3000 \
-	pytest src/tests/ui/ -v --alluredir=allure-results
+# K8S
+.PHONY: k8s-start
+k8s-start:
+	minikube start --driver=docker
+	helm upgrade --install nbank infra/kube/chart
 
-# Services for local development (port 3000)
-.PHONY: start-services
-start-services:
-	docker compose -f $(DOCKER_COMPOSE_FILE) up -d backend frontend
+.PHONY: k8s-check-context
+k8s-check-context:
+	kubectl config current-context
 
-.PHONY: stop-all
-stop-all:
-	docker compose -f $(DOCKER_COMPOSE_FILE) down
+.PHONY: k8s-check-services
+k8s-check-services:
+	kubectl get svc
+	kubectl get pods
 
-# Cleanup
-.PHONY: clean
-clean:
-	rm -rf allure-results/ allure-report/ .pytest_cache/
-	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+.PHONY: k8s-check-logs
+k8s-check-logs:
+	 kubectl logs deployment/backend
+
+.PHONY: k8s-port-forfard
+k8s-port-forward:
+	 kubectl port-forward svc/frontend 3000:80
+
+.PHONY: k8s-start-monitoring
+k8s-start-monitoring:
+	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts || true
+	helm repo add grafana https://grafana.github.io/helm-charts || true
+	helm repo update
+	helm upgrade --install monitoring prometheus-community/kube-prometheus-stack -n monitoring --create-namespace -f infra/kube/monitoring-values.yaml
+	helm upgrade --install loki grafana/loki-stack -n monitoring -f infra/kube/loki-values.yaml
+	kubectl create secret generic basic-backend-auth --from-literal=username=admin --from-literal=password=admin -n monitoring
+	kubectl apply -f infra/kube/spring-monitoring.yaml
+
+.PHONY: k8s-stop
+k8s-stop:
+	kubectl delete -f infra/kube/spring-monitoring.yaml || true
+	kubectl delete secret basic-backend-auth -n monitoring || true
+	helm uninstall monitoring -n monitoring || true
+	kubectl delete namespace monitoring || true
+	helm uninstall nbank || true
+	minikube stop
