@@ -1,3 +1,4 @@
+from src.main.api.helpers.allure_helpers import allure_step
 from src.main.api.models.comparison.model_assertions import ModelAssertions
 from src.main.api.models.create_account_response import CreateAccountResponse
 from src.main.api.models.create_user_request import CreateUserRequest
@@ -16,6 +17,7 @@ from src.main.api.steps.base_steps import BaseSteps
 
 
 class UserSteps(BaseSteps):
+    @allure_step("Login user: {user_request.username}")
     def login(self, user_request: CreateUserRequest) -> LoginUserResponses:
         login_request = LoginUserRequest(username=user_request.username, password=user_request.password)
         login_response: LoginUserResponses = ValidatedCrudRequester(
@@ -26,6 +28,7 @@ class UserSteps(BaseSteps):
         ModelAssertions(login_request, login_response).match()
         return login_response
 
+    @allure_step("Create account for user: {user_request.username}")
     def create_account(self, user_request: CreateUserRequest) -> CreateAccountResponse:
         create_account_response: CreateAccountResponse = ValidatedCrudRequester(
             RequestSpecs.user_auth_spec(user_request.username, user_request.password),
@@ -36,6 +39,7 @@ class UserSteps(BaseSteps):
         assert not create_account_response.transactions
         return create_account_response
 
+    @allure_step("Get all customer accounts for user: {user_request.username}")
     def get_all_customer_accounts(self, user_request: CreateUserRequest):
         customers_response = ValidatedCrudRequester(
             RequestSpecs.user_auth_spec(user_request.username, user_request.password),
@@ -44,6 +48,7 @@ class UserSteps(BaseSteps):
         ).get_all()
         return customers_response
 
+    @allure_step("Get account by ID: {account_id}")
     def get_account_by_id(self, account_id: int, user_request: CreateUserRequest) -> CreateAccountResponse:
         response = self.get_all_customer_accounts(user_request)
         accounts = response.json()
@@ -52,6 +57,7 @@ class UserSteps(BaseSteps):
                 return CreateAccountResponse.model_validate(account_data)
         raise ValueError(f"Account with id {account_id} not found in customer accounts")
 
+    @allure_step("Deposit {deposit_request.balance} to account {deposit_request.id}")
     def deposit_to_account(self, user_request: CreateUserRequest, deposit_request: DepositRequest) -> DepositResponse:
         deposit_response: DepositResponse = ValidatedCrudRequester(
             RequestSpecs.user_auth_spec(user_request.username, user_request.password),
@@ -61,6 +67,8 @@ class UserSteps(BaseSteps):
         assert deposit_response.balance == deposit_request.balance
         return deposit_response
 
+    @allure_step(
+        "Transfer {transfer_request.amount} from account {transfer_request.senderAccountId} to {transfer_request.receiverAccountId}")
     def transfer_money(self, transfer_request: TransferRequest, user_request: CreateUserRequest) -> TransferResponse:
         transfer_response: TransferResponse = TransferRequester(
             RequestSpecs.user_auth_spec(user_request.username, user_request.password),
@@ -68,5 +76,3 @@ class UserSteps(BaseSteps):
         ).post(transfer_request)
         self.created_objects.append(transfer_response)
         return transfer_response
-
-
