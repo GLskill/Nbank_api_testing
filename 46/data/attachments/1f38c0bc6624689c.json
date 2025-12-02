@@ -1,0 +1,12 @@
+{
+  "param_1": {
+    "senderAccountId": 3,
+    "receiverAccountId": 4,
+    "amount": 523.3894540339246
+  },
+  "param_2": {
+    "username": "bltwBrXN",
+    "password": "Q46S@iA0nm",
+    "role": "USER"
+  }
+}

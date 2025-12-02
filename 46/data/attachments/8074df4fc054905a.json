@@ -1,0 +1,26 @@
+{
+  "status_code": 200,
+  "body": [
+    {
+      "id": 3,
+      "accountNumber": "ACC3",
+      "balance": 523.3894540339246,
+      "transactions": [
+        {
+          "id": 2,
+          "amount": 1046.7789080678492,
+          "type": "DEPOSIT",
+          "timestamp": "Tue Dec 02 12:19:55 UTC 2025",
+          "relatedAccountId": 3
+        },
+        {
+          "id": 3,
+          "amount": 523.3894540339246,
+          "type": "TRANSFER_OUT",
+          "timestamp": "Tue Dec 02 12:19:56 UTC 2025",
+          "relatedAccountId": 4
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": 2,
+  "accountNumber": "ACC2",
+  "balance": 1641.4756948159106,
+  "transactions": [
+    {
+      "id": 1,
+      "amount": 1641.4756948159106,
+      "type": "DEPOSIT",
+      "timestamp": "Tue Dec 02 12:19:54 UTC 2025",
+      "relatedAccountId": 2
+    }
+  ]
+}
