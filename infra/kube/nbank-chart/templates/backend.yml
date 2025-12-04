@@ -39,5 +39,4 @@ spec:
       protocol: TCP
       port: 4111
       targetPort: 4111
-      nodePort: 30111
   type: NodePort
