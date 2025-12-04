@@ -1,0 +1,7 @@
+{
+  "param_1": {
+    "username": "admin",
+    "password": "admin",
+    "role": "ADMIN"
+  }
+}

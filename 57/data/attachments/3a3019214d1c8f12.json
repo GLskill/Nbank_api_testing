@@ -1,0 +1,13 @@
+{
+  "status_code": 200,
+  "body": [
+    {
+      "id": 7,
+      "username": "h1L0lImgjawsI",
+      "password": "$2a$10$zmoLy7U3zduS4kHnQsBpmOIs3x8K4.Fwp1177z0vu7On.S3Lk0L8u",
+      "name": null,
+      "role": "USER",
+      "accounts": []
+    }
+  ]
+}

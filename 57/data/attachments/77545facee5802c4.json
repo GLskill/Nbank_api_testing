@@ -1,0 +1,21 @@
+{
+  "id": 3,
+  "accountNumber": "ACC3",
+  "balance": 1898.8275787920065,
+  "transactions": [
+    {
+      "id": 2,
+      "amount": 3797.655157584013,
+      "type": "DEPOSIT",
+      "timestamp": "Thu Dec 04 11:39:13 UTC 2025",
+      "relatedAccountId": 3
+    },
+    {
+      "id": 3,
+      "amount": 1898.8275787920065,
+      "type": "TRANSFER_OUT",
+      "timestamp": "Thu Dec 04 11:39:14 UTC 2025",
+      "relatedAccountId": 4
+    }
+  ]
+}
