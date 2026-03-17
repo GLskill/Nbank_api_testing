@@ -33,6 +33,12 @@ Write-Host "`nApplication URLs:" -ForegroundColor Cyan
 Write-Host "Backend API: http://localhost:4111" -ForegroundColor Green
 Write-Host "Frontend UI: http://localhost:3000" -ForegroundColor Green
 
+Write-Host "`Helm started" -ForegroundColor Blue
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo add elastic https://helm.elastic.co
+helm repo update
+helm upgrade --install monitoring prometheus-community/kube-prometheus-stack -n monitoring --create-namespace  -f infra/kube/monitoring-values.yaml
+
 Write-Host "`nPort forwarding is running in background jobs." -ForegroundColor Yellow
 Write-Host "To stop port forwarding, run: Get-Job | Stop-Job" -ForegroundColor Yellow
 Write-Host "`nDeployment completed!" -ForegroundColor Green
