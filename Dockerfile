@@ -19,4 +19,6 @@ RUN mkdir -p logs
 
 COPY . .
 
-CMD pytest --log-level=DEBUG --log-cli-level=DEBUG --alluredir allure-results
+USER root
+
+CMD ["pytest", "--log-level=DEBUG", "--log-cli-level=DEBUG", "--alluredir", "allure-results"]
