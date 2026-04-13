@@ -1,0 +1,13 @@
+{
+  "status_code": 200,
+  "body": [
+    {
+      "id": 2,
+      "username": "l2o",
+      "password": "$2a$10$4u84OiD0JltjLyLx19qCLOf4/Xfr04TQ8erNpkV92QFuw.eosJPIK",
+      "name": null,
+      "role": "USER",
+      "accounts": []
+    }
+  ]
+}
