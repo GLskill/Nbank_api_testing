@@ -1,0 +1,19 @@
+{
+  "status_code": 200,
+  "body": [
+    {
+      "id": 2,
+      "accountNumber": "ACC2",
+      "balance": 1667.7379650630896,
+      "transactions": [
+        {
+          "id": 1,
+          "amount": 1667.7379650630896,
+          "type": "DEPOSIT",
+          "timestamp": "Tue Apr 14 12:14:31 UTC 2026",
+          "relatedAccountId": 2
+        }
+      ]
+    }
+  ]
+}

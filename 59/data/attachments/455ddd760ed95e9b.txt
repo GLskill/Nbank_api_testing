@@ -1,0 +1,2 @@
+[DEBUG] Creating page objects with frontend_url: http://localhost:3000
+[ALERT MESSAGE] ✅ User created successfully!

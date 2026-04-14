@@ -1,0 +1,11 @@
+
+============================================================
+Test Environment Configuration:
+  SERVER:        http://localhost:4111/api
+  API_VERSION:   /v1
+  Full API URL:  http://localhost:4111/api/v1
+  UI_BASE_URL:   http://localhost:3000
+  BASE_API_URL:  http://localhost:4111
+  BASE_UI_URL:   http://localhost:3000
+============================================================
+
