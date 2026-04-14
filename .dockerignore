@@ -13,6 +13,10 @@ build/
 venv/
 test_results/
 .git/
+.gitignore
 .idea/
 *.log
 .env
+env/
+ENV/
+.DS_store

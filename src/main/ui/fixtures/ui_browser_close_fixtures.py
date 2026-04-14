@@ -1,7 +1,6 @@
 import os
 import pytest
 from playwright.sync_api import sync_playwright
-
 from src.main.ui.page_object.user_deposit_money_page import UserDepositMoneyPage
 from src.main.ui.page_object.admin_panel_page import AdminPanel
 from src.main.ui.page_object.login_page import LoginPage
@@ -10,10 +9,6 @@ from src.main.ui.page_object.user_page import UserPage
 
 @pytest.fixture(scope="session")
 def config():
-    """
-    Конфигурация для UI тестов.
-    Приоритет: переменные окружения > config.json defaults
-    """
     # Читаем из переменных окружения с fallback
     ui_base_url = os.getenv("UI_BASE_URL") or os.getenv("BASE_UI_URL", "http://localhost:3000")
 
@@ -23,7 +18,7 @@ def config():
     return {
         "browser": browser,
         "headless": headless,
-        "frontend_url": ui_base_url,  # ✅ Теперь из переменных окружения
+        "frontend_url": ui_base_url,
         "viewport": {"width": 1920, "height": 1080},
         "record_video_dir": "src/tests/ui/videos/"
     }
@@ -45,7 +40,7 @@ def browser_context(config, playwright_instance):
     )
     page = context.new_page()
     # Увеличиваем timeout для GitHub Actions
-    page.set_default_timeout(30000)  # ✅ Увеличено с 5000 до 30000
+    page.set_default_timeout(30000)
     yield page
     context.close()
     browser.close()

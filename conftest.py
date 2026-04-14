@@ -1,10 +1,9 @@
-import os
-import pytest
-import logging
-import requests
+import random
+import time
 from time import sleep
 
-# Импорты фикстур
+import requests
+
 from src.main.api.fixtures.user_fixtures import *
 from src.main.api.fixtures.api_fixtures import *
 from src.main.api.fixtures.object_fixtures import *
@@ -14,15 +13,75 @@ from src.main.ui.fixtures.ui_browser_close_fixtures import *
 from src.main.ui.fixtures.base_steps_fixtures import *
 
 
+def _apply_global_seed(seed: int) -> None:
+    random.seed(seed)
+    try:
+        from faker import Faker
+        Faker.seed(seed)
+    except Exception:
+        pass
+
+    try:
+        from src.main.api.generators import random_data
+        if hasattr(random_data, "faker"):
+            random_data.faker.seed_instance(seed)
+    except Exception:
+        pass
+
+
+def pytest_addoption(parser: pytest.Parser) -> None:
+    parser.addoption(
+        "--seed",
+        action="store",
+        default=os.getenv("PYTEST_SEED"),
+        help="..."
+    )
+
+
+def pytest_configure(config: pytest.Config) -> None:
+    seed = None
+    if hasattr(config, "workerinput"):
+        seed = config.workerinput.get("seed")
+
+    if seed is None:
+        opt = config.getoption("--seed")
+        seed = int(opt) if opt is not None else int(time.time_ns() % 2_000_000_000)
+
+    config._nbank_seed = int(seed)
+    _apply_global_seed(int(seed))
+
+
+def pytest_configure_node(node) -> None:
+    seed = getattr(node.config, "_nbank_seed", None)
+    if seed is not None:
+        node.workerinput["seed"] = int(seed)
+
+
+def pytest_collection_finish(session: pytest.Session) -> None:
+    config = session.config
+    base_seed = getattr(config, '_nbank_seed', None)
+    if base_seed is None:
+        return
+    workerid = None
+    if hasattr(config, "workerinput"):
+        workerid = config.workerinput.get("workerid")
+    if workerid and str(workerid).startswith("gw"):
+        try:
+            idx = int(str(workerid)[2:])
+        except Exception:
+            idx = 0
+        runtime_seed = int(base_seed) + (idx + 1) * 1_000_000
+    else:
+        runtime_seed = int(base_seed)
+
+    _apply_global_seed(runtime_seed)
+
+    # Опционально: логи для дебага
+    print(f"[{workerid or 'main'}] Using seed: {runtime_seed}")
+
+
 @pytest.fixture(scope="session", autouse=True)
 def setup_test_environment():
-    """
-    Настройка окружения для тестов.
-    Поддерживает оба формата переменных:
-    - SERVER + API_VERSION (для API)
-    - UI_BASE_URL (для UI)
-    - BASE_API_URL + BASE_UI_URL (альтернативный формат)
-    """
     # API конфигурация
     server = os.getenv("SERVER", "http://localhost:4111/api")
     api_version = os.getenv("API_VERSION", "/v1")
@@ -71,9 +130,15 @@ def healthcheck(setup_test_environment):
 
     logging.info(f"Backend healthcheck: {health_url}")
 
+    # Учетные данные для health check
+    headers = {
+        "Authorization": "Basic YWRtaW46YWRtaW4="  # admin:admin в base64
+    }
+
     for attempt in range(1, 11):
         try:
-            response = requests.get(health_url, timeout=5)
+            # ✅ ВАЖНО: передаём headers в запрос!
+            response = requests.get(health_url, headers=headers, timeout=5)
             if response.status_code == 200:
                 logging.info(f"✓ Backend is ready at {health_url}")
                 return
@@ -82,4 +147,3 @@ def healthcheck(setup_test_environment):
         sleep(2)
 
     logging.error(f"❌ Backend health check failed after 10 attempts: {health_url}")
-    # Не падаем здесь, пусть тесты попробуют выполниться

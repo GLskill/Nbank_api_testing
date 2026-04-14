@@ -6,3 +6,6 @@ faker==37.8.0
 rstr==3.2.2
 ruff==0.13.2
 pytest-playwright==0.7.1
+pytest-xdist
+softest
+uuid

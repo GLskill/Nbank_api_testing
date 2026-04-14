@@ -5,7 +5,7 @@ TAG = latest
 
 DOCKER_COMPOSE_FILE = infra/docker_compose/docker-compose.yml
 
-TEST_OUTPUT_DIR ?= test-results/$(shell date +"%Y%_m_%d_%H_%M")
+EST_OUTPUT_DIR ?= test-results/$(shell date +"%Y_%m_%d_%H_%M")
 SERVER ?= http://localhost:4111/api
 UI_BASE_URL ?= http://localhost:3000
 
@@ -67,7 +67,7 @@ k8s-check-services:
 k8s-check-logs:
 	 kubectl logs deployment/backend
 
-.PHONY: k8s-port-forfard
+.PHONY: k8s-port-forward
 k8s-port-forward:
 	 kubectl port-forward svc/frontend 3000:80
 

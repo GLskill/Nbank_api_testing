@@ -8,11 +8,32 @@ on:
     paths:
       - 'src/**'
   workflow_dispatch:
+    inputs:
+      api_version:
+        description: "Backend version tag (matches @pytest.mark.api_version(..))"
+        required: true
+        type: choice
+        options:
+          - with_database
+          - with_fraud_check
+      suite:
+        description: "which suite to run "
+        required: true
+        type: choice
+        options:
+          - api
+          - ui
+          - api+ui
+      markers:
+        description: "additional pytest markers"
+        required: false
+        default: ""
 
 jobs:
   run-tests:
     name: Setup services (review app) and run tests
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -20,21 +41,57 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-          cache: 'pip'
-      - run: pip install -r requirements.txt
 
-      - name: Setup playwright
-        run: playwright install --with-deps
+      - uses: actions/cache@v5
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
 
-      - name: Run app
-        run: make start-app
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          playwright install --with-deps
 
-      - name: Run tests
+      - name: Start services
+        run: |
+          docker compose -f infra/docker_compose/docker-compose.yml up -d
+          for i in {1..60}; do
+            if curl -sf http://localhost:4111/actuator/health >/dev/null; then
+              echo "Backend is UP"
+              break
+            fi
+            sleep 2
+          done
+          curl -sf http://localhost:4111/actuator/health
+
+      - name: Run Pytest
         env:
           SERVER: http://localhost:4111/api
           API_VERSION: /v1
           UI_BASE_URL: http://localhost:3000
-        run: make run-tests
+        run: |
+          set -eux
+
+          API_VERSION_INPUT="${{ inputs.api_version }}"
+          SUITE_INPUT="${{ inputs.suite }}"
+          MARKERS="${{ inputs.markers }}"
+
+          M_OPT=""
+
+          if [ -n "$MARKERS" ]; then
+            M_OPT="-m $MARKERS"
+          fi
+
+          if [ "$SUITE_INPUT" = "api" ]; then
+            pytest -m api --api-version "$API_VERSION_INPUT" $M_OPT -q
+          elif [ "$SUITE_INPUT" = "ui" ]; then
+            pytest -m ui $M_OPT -q
+          else
+            pytest -m api --api-version "$API_VERSION_INPUT" $M_OPT -q
+            pytest -m ui $M_OPT -q
+          fi
 
       - name: Load test report history
         uses: actions/checkout@v5
@@ -63,4 +120,4 @@ jobs:
 
       - name: Stop services
         if: always()
-        run: make stop-app
+        run: docker compose -f infra/docker_compose/docker-compose.yml down -d
