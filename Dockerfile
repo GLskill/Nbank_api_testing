@@ -5,15 +5,19 @@ ARG UI_BASE_URL=http://localhost:3000
 
 ENV SERVER=${SERVER}
 ENV UI_BASE_URL=${UI_BASE_URL}
-
 ENV PLAYWRIGHT_TEST_BASE_URL=${UI_BASE_URL}
 
 WORKDIR /app
 
 COPY requirements.txt .
+
 RUN pip install --no-cache-dir -r requirements.txt
-RUN apt-get update && playwright install-deps
-RUN playwright install
+RUN set -eux; \
+    apt-get update -o Acquire::Retries=3 || \
+    apt-get update -o Acquire::Retries=3 -o Acquire::AllowInsecureRepositories=true -o Acquire::AllowDowngradeToInsecureRepositories=true; \
+    playwright install-deps; \
+    playwright install; \
+    rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p logs
 
@@ -21,4 +25,4 @@ COPY . .
 
 USER root
 
-CMD ["pytest", "--log-level=DEBUG", "--log-cli-level=DEBUG", "--alluredir", "allure-results"]
+CMD ["pytest", "-v", "--tb=short", "--alluredir", "allure-results"]

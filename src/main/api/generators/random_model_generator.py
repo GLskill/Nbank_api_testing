@@ -3,17 +3,26 @@ import uuid
 import rstr
 import random
 from typing import Any, Annotated, get_type_hints, get_origin, get_args
-
+from src.main.api.generators.random_data import RandomData
 from src.main.api.generators.generating_rule import GeneratingRule
 
 
 class RandomModelGenerator:
+    _FIELD_GENERATORS = {
+        'username': RandomData.get_username,
+        'password': RandomData.get_password,
+    }
+
     @staticmethod
     def generate(cls: type) -> Any:
         type_hints = get_type_hints(cls, include_extras=True)
         init_data = {}
-        for field_name, annotated_type in type_hints.items():
-            rule = None
+        for field_name, annotated_type in type_hints.items():    # Сначала проверяем специальные генераторы
+            if field_name in RandomModelGenerator._FIELD_GENERATORS:
+                init_data[field_name] = RandomModelGenerator._FIELD_GENERATORS[field_name]()
+                continue
+
+            rule = None     # Остальная логика для полей с GeneratingRule
             actual_type = annotated_type
             if get_origin(annotated_type) is Annotated:
                 actual_type, *annotations = get_args(annotated_type)
@@ -30,6 +39,9 @@ class RandomModelGenerator:
     @staticmethod
     def _generate_from_regex(regex: str, field_type: type) -> Any:
         generated = rstr.xeger(regex)
+        if field_type is str and len(generated) <= 15 and '^' not in regex and '$' not in regex:
+            unique_suffix = str(uuid.uuid4())[:8]
+            generated = f"{generated}{unique_suffix}"
         if field_type is int:
             return int(generated)
         if field_type is float:
@@ -52,4 +64,3 @@ class RandomModelGenerator:
             return [str(uuid.uuid4())[:5] for _ in random.randint(3, 10)]
         elif isinstance(field_type, type):
             return
-

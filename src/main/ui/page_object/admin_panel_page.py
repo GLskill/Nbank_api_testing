@@ -1,4 +1,4 @@
-from playwright.sync_api import Page
+from playwright.sync_api import Page, expect
 from src.main.ui.page_object.base_page import BasePage
 
 
@@ -14,7 +14,9 @@ class AdminPanel(BasePage):
         return self
 
     def is_admin_panel_visible(self):
-        return self.page.locator("text=Admin Panel").is_visible()
+        locator = self.page.locator("text=Admin Panel")
+        expect(locator).to_be_visible(timeout=5000)
+        return True
 
     def all_user_visible(self):
         return self.page.locator("text=All Users").is_visible()

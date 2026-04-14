@@ -3,6 +3,11 @@ services:
     image: nobugsme/nbank:with_username_error_fix
     ports:
       - "4111:4111"
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:4111/actuator/health || exit 1" ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
     networks:
       - nbank-network
 

@@ -25,8 +25,21 @@ class UserDepositMoneyPage(BasePage):
     def deposit_button(self):
         return self.page.get_by_role("button", name="💵 Deposit")
 
+    def wait_for_accounts_to_load(self):
+        """Ждём, пока в dropdown появятся аккаунты (не только placeholder)"""
+        self.page.wait_for_function(
+            "document.querySelector('select option:nth-child(2)') !== null",
+            timeout=10000
+        )
+        return self
+
     def select_account(self, account_name: str):
-        self.account_selector.select_option(label=account_name)
+        if account_name.startswith("ACC"):
+            account_id = account_name.replace("ACC", "")
+        else:
+            account_id = account_name
+
+        self.account_selector.select_option(value=account_id)
         return self
 
     def enter_amount(self, amount: str):
@@ -38,6 +51,7 @@ class UserDepositMoneyPage(BasePage):
         return self
 
     def make_deposit(self, account: str, amount: str):
+        self.wait_for_accounts_to_load()  # Ждём загрузки аккаунтов
         self.select_account(account)
         self.enter_amount(amount)
         self.click_deposit()
